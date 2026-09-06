@@ -23,6 +23,8 @@ import org.eblocker.server.common.data.IpAddress;
 import org.eblocker.server.common.data.TestDeviceFactory;
 import org.eblocker.server.common.pubsub.Channels;
 import org.eblocker.server.common.pubsub.PubSubService;
+import org.eblocker.server.common.registration.DeviceRegistrationProperties;
+import org.eblocker.server.common.registration.RegistrationState;
 import org.eblocker.server.http.service.DeviceService;
 import org.eblocker.server.common.TestClock;
 import org.junit.After;
@@ -48,6 +50,7 @@ public class ArpSpooferTest {
     private ConcurrentMap<String, Long> arpProbeCache;
     private IpResponseTable ipResponseTable;
     private DataSource dataSource;
+    private DeviceRegistrationProperties registrationProperties;
     private DeviceService deviceService;
     private PubSubService pubSubService;
     private NetworkInterfaceWrapper networkInterface;
@@ -60,14 +63,16 @@ public class ArpSpooferTest {
         ipResponseTable = new IpResponseTable();
         clock = new TestClock(ZonedDateTime.now());
         dataSource = Mockito.mock(DataSource.class);
+        registrationProperties = Mockito.mock(DeviceRegistrationProperties.class);
         deviceService = Mockito.mock(DeviceService.class);
         pubSubService = Mockito.mock(PubSubService.class);
         networkInterface = Mockito.mock(NetworkInterfaceWrapper.class);
+        when(registrationProperties.getRegistrationState()).thenReturn(RegistrationState.OK);
         when(networkInterface.getFirstIPv4Address()).thenReturn(Ip4Address.parse("192.168.0.10"));
         when(networkInterface.getNetworkPrefixLength(IpAddress.parse("192.168.0.10"))).thenReturn(24);
         when(networkInterface.getHardwareAddressHex()).thenReturn("c82a144dc40e");
 
-        arpSpoofer = new ArpSpoofer(5, 10, 5, EMERGENCY_IP, arpProbeCache, ipResponseTable, clock, dataSource, deviceService, pubSubService, networkInterface);
+        arpSpoofer = new ArpSpoofer(5, 10, 5, EMERGENCY_IP, arpProbeCache, ipResponseTable, clock, dataSource, registrationProperties, deviceService, pubSubService, networkInterface);
 
         TestDeviceFactory tdf = new TestDeviceFactory(deviceService);
         tdf.addDevice("abcdef012345", GATEWAY, true);
@@ -108,6 +113,26 @@ public class ArpSpooferTest {
 
     @After
     public void tearDown() throws Exception {
+    }
+
+    @Test
+    public void dontSpoofWhileSetupWizardIsIncomplete() {
+        when(registrationProperties.getRegistrationState()).thenReturn(RegistrationState.NEW);
+
+        arpSpoofer.run();
+
+        verifyNoInteractions(pubSubService);
+    }
+
+    @Test
+    public void startSpoofingAfterSetupWizardIsCompletedWithoutRecreatingSpoofer() {
+        when(registrationProperties.getRegistrationState()).thenReturn(RegistrationState.NEW, RegistrationState.OK);
+
+        arpSpoofer.run();
+        verifyNoInteractions(pubSubService);
+
+        arpSpoofer.run();
+        verify(pubSubService).publish(Channels.ARP_OUT, "1/c82a144dc40e/192.168.0.10/ffffffffffff/192.168.0.10");
     }
 
     @Test
