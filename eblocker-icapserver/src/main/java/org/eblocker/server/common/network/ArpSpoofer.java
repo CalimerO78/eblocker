@@ -6,7 +6,7 @@
  * (the "License"); You may not use this work except in compliance with
  * the License. You may obtain a copy of the License at:
  *
- *   https://joinup.ec.europa.eu/page/eupl-text-11-12
+ * https://joinup.ec.europa.eu/page/eupl-text-11-12
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" basis,
@@ -25,6 +25,8 @@ import org.eblocker.server.common.data.Ip4Address;
 import org.eblocker.server.common.data.IpAddress;
 import org.eblocker.server.common.pubsub.Channels;
 import org.eblocker.server.common.pubsub.PubSubService;
+import org.eblocker.server.common.registration.DeviceRegistrationProperties;
+import org.eblocker.server.common.registration.RegistrationState;
 import org.eblocker.server.common.util.Ip4Utils;
 import org.eblocker.server.http.service.DeviceService;
 import org.slf4j.Logger;
@@ -41,6 +43,7 @@ public class ArpSpoofer implements Runnable {
     private final IpResponseTable ipResponseTable;
     private final Clock clock;
     private final DataSource dataSource;
+    private final DeviceRegistrationProperties registrationProperties;
     private final DeviceService deviceService;
     private final PubSubService pubSubService;
     private final NetworkInterfaceWrapper networkInterface;
@@ -58,6 +61,7 @@ public class ArpSpoofer implements Runnable {
                       IpResponseTable ipResponseTable,
                       Clock clock,
                       DataSource dataSource,
+                      DeviceRegistrationProperties registrationProperties,
                       DeviceService deviceService,
                       PubSubService pubSubService,
                       NetworkInterfaceWrapper networkInterface) {
@@ -66,6 +70,7 @@ public class ArpSpoofer implements Runnable {
         this.clock = clock;
         this.pubSubService = pubSubService;
         this.dataSource = dataSource;
+        this.registrationProperties = registrationProperties;
         this.deviceService = deviceService;
         this.networkInterface = networkInterface;
         this.healingNumPackets = healingNumPackets;
@@ -91,6 +96,11 @@ public class ArpSpoofer implements Runnable {
 
     @Override
     public void run() {
+        if (registrationProperties.getRegistrationState() == RegistrationState.NEW) {
+            log.debug("ARP spoofing suppressed while setup wizard is incomplete");
+            return;
+        }
+
         try {
             processEnabledDevices();
             log.debug("Started ARPSpoofing by processing enabled devices...");
