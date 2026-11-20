@@ -39,6 +39,21 @@ describe('App settings; Home VPN diagnostics', function() {
         expect(ctrl.status.certificate).toBe(true);
     });
 
+    it('shows only dedicated OpenVPN and WireGuard log files', function() {
+        httpBackend.expectGET('/api/adminconsole/systeminfo/logs').respond(200, {files: [
+            {id: 'syslog'},
+            {id: 'eblocker/eblocker.log'},
+            {id: 'openvpn/server.log'},
+            {id: 'wireguard.log'},
+            {id: 'wg0.log'}
+        ]});
+        ctrl.loadLogs();
+        httpBackend.flush();
+        expect(ctrl.logFiles.map(function(file) { return file.id; })).toEqual([
+            'openvpn/server.log', 'wireguard.log', 'wg0.log'
+        ]);
+    });
+
     it('does not issue a log request for search text under three characters', function() {
         ctrl.logFile = 'test.log';
         ctrl.logQuery = 'ab';

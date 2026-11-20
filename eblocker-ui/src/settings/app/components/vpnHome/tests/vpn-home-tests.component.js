@@ -30,11 +30,25 @@ export default {
             return $q.all(requests).finally(function() { vm.loading = false; });
         };
 
+        // Only dedicated VPN files belong on this page. Generic system logs remain in Systeminfo.
+        function isVpnLog(file) {
+            return file && /(?:^|[\/._-])(?:openvpn|wireguard|wg-quick|wg[0-9]+)(?=[\/._-]|$)/i
+                .test(String(file.id || ''));
+        }
+
         vm.loadLogs = function() {
             vm.logsError = false;
             return $http.get('/api/adminconsole/systeminfo/logs').then(function(response) {
-                vm.logFiles = response.data.files || [];
-            }, function() { vm.logsError = true; });
+                vm.logFiles = (response.data.files || []).filter(isVpnLog);
+                if (!vm.logFiles.some(function(file) { return file.id === vm.logFile; })) {
+                    vm.logFile = null;
+                    vm.logResult = null;
+                    vm.logSerial++;
+                }
+            }, function() {
+                vm.logFiles = [];
+                vm.logsError = true;
+            });
         };
 
         vm.readLog = function() {

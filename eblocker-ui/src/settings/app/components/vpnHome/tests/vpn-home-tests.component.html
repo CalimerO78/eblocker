@@ -35,7 +35,7 @@
                 </div>
             </div>
         </div>
-        <div class="config-frame md-whiteframe-z1" style="max-width: 900px; margin-top: 12px;">
+        <div class="config-frame md-whiteframe-z1" ng-if="vm.logFiles.length > 0" style="max-width: 900px; margin-top: 12px;">
             <h3>{{'ADMINCONSOLE.VPN_HOME_TESTS.LOG_READER' | translate}}</h3>
             <p>{{'ADMINCONSOLE.SYSTEM_INFO.LOGS_SCOPE' | translate}}</p>
             <md-input-container style="min-width: 260px;">

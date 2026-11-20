@@ -3,7 +3,7 @@
     <parent>
         <artifactId>eblocker-parent</artifactId>
         <groupId>org.eblocker</groupId>
-        <version>4.1.0+wglite1</version>
+        <version>4.1.0+wglite2</version>
         <relativePath>../eblocker-parent</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
