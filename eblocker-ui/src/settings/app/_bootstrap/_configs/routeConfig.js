@@ -898,6 +898,16 @@ export default function RoutesConfig($urlRouterProvider, $stateProvider, STATES)
         component: 'resetComponent'
     };
 
+    const systemInfo = {
+        name: 'systeminfo',
+        url: slashOptionSubState + 'systeminfo',
+        parent: system.name,
+        tabOrder: 3,
+        requiredLicense: system.requiredLicense,
+        translationKey: 'ADMINCONSOLE.SYSTEM_INFO.LABEL',
+        component: 'systemInfoComponent'
+    };
+
     const status = {
         name: 'status',
         url: slashOptionSubState + 'status',
@@ -1135,7 +1145,7 @@ export default function RoutesConfig($urlRouterProvider, $stateProvider, STATES)
         sslCertificate, sslFails, trustedApps, trustedDomains, ipAnon, ipAnonState,
         system, network, networkSettings, networkSettingsIp6, networkWizard, vpnHome, vpnHomeState,
         vpnHomeDynDns, vpnHomeOpenVpn, vpnHomeWireGuard, vpnHomeTests, manualRecording, users,
-        blacklists, whitelists, tor, vpnconnect, dns, status, timeAndLanguage,
+        blacklists, whitelists, tor, vpnconnect, dns, status, systemInfo, timeAndLanguage,
         events, backup, reset, diagnostics, usersDetails,
         blacklistDetails, whitelistDetails, devicesState, devicesDetails, vpnconnectDetails, tasks,
         trustedAppsDetails, sslstate, filter, filterState, advancedFilterSettings,

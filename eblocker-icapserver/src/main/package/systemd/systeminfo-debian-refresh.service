@@ -1,0 +1,10 @@
+[Unit]
+Description=Refresh isolated Debian package metadata for eBlocker Systeminfo
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/eblocker-icap/scripts/systeminfo-debian-refresh.sh
+Nice=10
+IOSchedulingClass=idle

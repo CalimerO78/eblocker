@@ -1,0 +1,323 @@
+<div class="settings-child-view system-info-view">
+    <header class="si-header">
+        <div>
+            <h2>{{'ADMINCONSOLE.SYSTEM_INFO.LABEL' | translate}}</h2>
+            <p>{{'ADMINCONSOLE.SYSTEM_INFO.DESCRIPTION' | translate}}</p>
+        </div>
+        <div class="si-actions">
+            <span class="si-live" ng-if="vm.info"><span class="si-live-dot"></span>{{'ADMINCONSOLE.SYSTEM_INFO.LIVE' | translate}}</span>
+            <md-button class="md-raised" ng-click="vm.refresh()" ng-disabled="vm.loading">
+                {{'ADMINCONSOLE.SYSTEM_INFO.REFRESH' | translate}}
+            </md-button>
+        </div>
+    </header>
+    <nav class="si-subtabs" aria-label="Systeminfo">
+        <button type="button" ng-class="{'is-active': vm.activeView === 'overview'}"
+                ng-click="vm.selectView('overview')">{{'ADMINCONSOLE.SYSTEM_INFO.OVERVIEW' | translate}}</button>
+        <button type="button" ng-class="{'is-active': vm.activeView === 'lists'}"
+                ng-click="vm.selectView('lists')">{{'ADMINCONSOLE.SYSTEM_INFO.LISTS' | translate}}</button>
+        <button type="button" ng-class="{'is-active': vm.activeView === 'packages'}"
+                ng-click="vm.selectView('packages')">{{'ADMINCONSOLE.SYSTEM_INFO.PACKAGES' | translate}}</button>
+        <button type="button" ng-class="{'is-active': vm.activeView === 'eblocker'}"
+                ng-click="vm.selectView('eblocker')">eBlocker</button>
+        <button type="button" ng-class="{'is-active': vm.activeView === 'logs'}"
+                ng-click="vm.selectView('logs')">{{'ADMINCONSOLE.SYSTEM_INFO.LOGFILES' | translate}}</button>
+    </nav>
+    <div ng-if="vm.activeView === 'overview'">
+    <p class="si-error" ng-if="vm.error">{{'ADMINCONSOLE.SYSTEM_INFO.LOAD_ERROR' | translate}}</p>
+    <p class="si-timestamp" ng-if="vm.info">{{'ADMINCONSOLE.SYSTEM_INFO.MEASURED_AT' | translate}}: {{vm.info.sampledAt | date:'medium'}} · {{'ADMINCONSOLE.SYSTEM_INFO.AUTO_REFRESH' | translate}}</p>
+
+    <div ng-if="vm.info" class="si-dashboard">
+        <section class="si-meter-card">
+            <div class="si-card-heading"><span>{{'ADMINCONSOLE.SYSTEM_INFO.CPU_LOAD' | translate}}</span><strong>{{vm.info.cpu.loadPercent === null ? '–' : (vm.info.cpu.loadPercent | number:1) + ' %'}}</strong></div>
+            <div class="si-meter" aria-hidden="true"><span ng-repeat="tick in vm.meterTicks track by $index" ng-class="{'is-active': vm.meterActive(vm.info.cpu.loadPercent, $index)}"></span></div>
+            <p>{{vm.info.cpu.logicalCores}} {{'ADMINCONSOLE.SYSTEM_INFO.CPU_CORES' | translate}}</p>
+        </section>
+        <section class="si-meter-card">
+            <div class="si-card-heading"><span>{{'ADMINCONSOLE.SYSTEM_INFO.MEMORY' | translate}}</span><strong>{{vm.memoryPercent === null ? '–' : (vm.memoryPercent | number:0) + ' %'}}</strong></div>
+            <div class="si-meter" aria-hidden="true"><span ng-repeat="tick in vm.meterTicks track by $index" ng-class="{'is-active': vm.meterActive(vm.memoryPercent, $index)}"></span></div>
+            <p>{{vm.formatBytes(vm.info.memory.usedBytes)}} / {{vm.formatBytes(vm.info.memory.totalBytes)}}</p>
+        </section>
+        <section class="si-meter-card">
+            <div class="si-card-heading"><span>{{'ADMINCONSOLE.SYSTEM_INFO.STORAGE' | translate}}</span><strong>{{vm.diskPercent === null ? '–' : (vm.diskPercent | number:0) + ' %'}}</strong></div>
+            <div class="si-meter" aria-hidden="true"><span ng-repeat="tick in vm.meterTicks track by $index" ng-class="{'is-active': vm.meterActive(vm.diskPercent, $index)}"></span></div>
+            <p ng-if="vm.mainDisk">{{vm.formatBytes(vm.mainDisk.availableBytes)}} {{'ADMINCONSOLE.SYSTEM_INFO.FREE_OF' | translate}} {{vm.formatBytes(vm.mainDisk.totalBytes)}}</p>
+            <p ng-if="!vm.mainDisk">{{'ADMINCONSOLE.SYSTEM_INFO.UNAVAILABLE' | translate}}</p>
+        </section>
+    </div>
+
+    <div ng-if="vm.info" class="si-grid">
+        <section class="si-card">
+            <h3>{{'ADMINCONSOLE.SYSTEM_INFO.HARDWARE' | translate}}</h3>
+            <dl>
+                <dt>{{'ADMINCONSOLE.SYSTEM_INFO.PLATFORM' | translate}}</dt><dd>{{('ADMINCONSOLE.SYSTEM_INFO.PLATFORM_TYPE.' + vm.info.hardware.platform) | translate}}</dd>
+                <dt>{{'ADMINCONSOLE.SYSTEM_INFO.MODEL' | translate}}</dt><dd>{{vm.info.hardware.model || ('ADMINCONSOLE.SYSTEM_INFO.UNAVAILABLE' | translate)}}</dd>
+                <dt>{{'ADMINCONSOLE.SYSTEM_INFO.ARCHITECTURE' | translate}}</dt><dd>{{vm.info.hardware.architecture || ('ADMINCONSOLE.SYSTEM_INFO.UNAVAILABLE' | translate)}}</dd>
+                <dt>{{'ADMINCONSOLE.SYSTEM_INFO.CPU_MODEL' | translate}}</dt><dd>{{vm.info.hardware.cpuModel || ('ADMINCONSOLE.SYSTEM_INFO.UNAVAILABLE' | translate)}}</dd>
+                <dt>{{'ADMINCONSOLE.SYSTEM_INFO.UPTIME' | translate}}</dt><dd>{{vm.formatUptime(vm.info.uptimeSeconds) || ('ADMINCONSOLE.SYSTEM_INFO.UNAVAILABLE' | translate)}}</dd>
+            </dl>
+        </section>
+        <section class="si-card">
+            <h3>{{'ADMINCONSOLE.SYSTEM_INFO.MEMORY' | translate}}</h3>
+            <dl>
+                <dt>{{'ADMINCONSOLE.SYSTEM_INFO.TOTAL' | translate}}</dt><dd>{{vm.formatBytes(vm.info.memory.totalBytes) || '–'}}</dd>
+                <dt>{{'ADMINCONSOLE.SYSTEM_INFO.FREE' | translate}}</dt><dd>{{vm.formatBytes(vm.info.memory.freeBytes) || '–'}}</dd>
+                <dt>{{'ADMINCONSOLE.SYSTEM_INFO.AVAILABLE' | translate}}</dt><dd>{{vm.formatBytes(vm.info.memory.availableBytes) || '–'}}</dd>
+                <dt>{{'ADMINCONSOLE.SYSTEM_INFO.USED' | translate}}</dt><dd>{{vm.formatBytes(vm.info.memory.usedBytes) || '–'}}</dd>
+                <dt>Swap</dt><dd>{{vm.formatBytes(vm.info.memory.swapUsedBytes) || '–'}} / {{vm.formatBytes(vm.info.memory.swapTotalBytes) || '–'}}</dd>
+                <dt>{{'ADMINCONSOLE.SYSTEM_INFO.JAVA_HEAP' | translate}}</dt><dd>{{vm.formatBytes(vm.info.memory.heapUsedBytes) || '–'}} / {{vm.formatBytes(vm.info.memory.heapMaxBytes) || '–'}}</dd>
+            </dl>
+        </section>
+        <section class="si-card">
+            <h3>{{'ADMINCONSOLE.SYSTEM_INFO.NETWORK' | translate}}</h3>
+            <p class="si-subtle">{{'ADMINCONSOLE.SYSTEM_INFO.NETWORK_MODE' | translate}}: {{vm.info.networkMode ? (('ADMINCONSOLE.SYSTEM_INFO.NETWORK_MODE_TYPE.' + vm.info.networkMode) | translate) : ('ADMINCONSOLE.SYSTEM_INFO.UNAVAILABLE' | translate)}}</p>
+            <div class="si-adapter" ng-repeat="adapter in vm.info.network track by adapter.name">
+                <h4><span class="si-status-dot" ng-class="{'is-up': adapter.up}"></span>{{adapter.name}} <small>{{(adapter.up ? 'ADMINCONSOLE.SYSTEM_INFO.UP' : 'ADMINCONSOLE.SYSTEM_INFO.DOWN') | translate}}<span ng-if="adapter.speedMbps"> · {{adapter.speedMbps}} Mbit/s</span></small></h4>
+                <dl><dt>IP</dt><dd>{{adapter.addresses.join(', ') || '–'}}</dd>
+                    <dt>Gateway</dt><dd>{{adapter.gateways.join(', ') || '–'}}</dd>
+                    <dt>{{'ADMINCONSOLE.SYSTEM_INFO.LINK_SPEED' | translate}}</dt>
+                    <dd>{{adapter.speedMbps ? adapter.speedMbps + ' Mbit/s' : ('ADMINCONSOLE.SYSTEM_INFO.UNAVAILABLE' | translate)}}</dd>
+                    <dt>{{'ADMINCONSOLE.SYSTEM_INFO.RX_RATE' | translate}}</dt>
+                    <dd>{{adapter.rxRate === null || adapter.rxRate === undefined ? '–' : vm.formatRate(adapter.rxRate)}}</dd>
+                    <dt>{{'ADMINCONSOLE.SYSTEM_INFO.TX_RATE' | translate}}</dt>
+                    <dd>{{adapter.txRate === null || adapter.txRate === undefined ? '–' : vm.formatRate(adapter.txRate)}}</dd>
+                </dl>
+                <div class="si-network-meter" ng-if="adapter.rxPercent !== null && adapter.rxPercent !== undefined">
+                    <span>{{'ADMINCONSOLE.SYSTEM_INFO.NETWORK_LOAD' | translate}}</span>
+                    <strong>↓ {{adapter.rxPercent | number:1}} % · ↑ {{adapter.txPercent | number:1}} %</strong>
+                    <div class="si-network-track"><i ng-style="{width: adapter.rxPercent + '%'}"></i></div>
+                    <div class="si-network-track is-transmit"><i ng-style="{width: adapter.txPercent + '%'}"></i></div>
+                </div>
+            </div>
+            <dl><dt>DNS</dt><dd>{{vm.info.dnsServers.join(', ') || '–'}}</dd></dl>
+        </section>
+        <section class="si-card">
+            <h3>{{'ADMINCONSOLE.SYSTEM_INFO.SOFTWARE' | translate}}</h3>
+            <dl>
+                <dt>eBlockerOS</dt><dd>{{vm.info.version}}</dd>
+                <dt>{{'ADMINCONSOLE.SYSTEM_INFO.BUILD_ID' | translate}}</dt><dd>{{vm.info.build.buildId || '–'}}</dd>
+                <dt>{{'ADMINCONSOLE.SYSTEM_INFO.ENHANCEMENTS' | translate}}</dt><dd>{{vm.info.build.enhancements || '–'}}</dd>
+                <dt>{{'ADMINCONSOLE.SYSTEM_INFO.SOURCE_REVISION' | translate}}</dt><dd class="si-code">{{vm.info.build.baseRevision || '–'}}</dd>
+                <dt>{{'ADMINCONSOLE.SYSTEM_INFO.TIMEZONE' | translate}}</dt><dd>{{vm.info.time.zone}}</dd>
+                <dt>{{'ADMINCONSOLE.SYSTEM_INFO.SYNCHRONIZED' | translate}}</dt><dd>{{(vm.info.time.synchronized === null ? 'ADMINCONSOLE.SYSTEM_INFO.UNAVAILABLE' : (vm.info.time.synchronized ? 'ADMINCONSOLE.SYSTEM_INFO.YES' : 'ADMINCONSOLE.SYSTEM_INFO.NO')) | translate}}</dd>
+            </dl>
+        </section>
+        <section class="si-card">
+            <h3>{{'ADMINCONSOLE.SYSTEM_INFO.STORAGE' | translate}}</h3>
+            <dl ng-repeat="disk in vm.info.storage track by disk.mount"><dt>{{disk.mount}}</dt><dd>{{vm.formatBytes(disk.availableBytes)}} {{'ADMINCONSOLE.SYSTEM_INFO.FREE_OF' | translate}} {{vm.formatBytes(disk.totalBytes)}}</dd></dl>
+            <p class="si-subtle">{{'ADMINCONSOLE.SYSTEM_INFO.DISK_HEALTH_UNAVAILABLE' | translate}}</p>
+            <h4>{{'ADMINCONSOLE.SYSTEM_INFO.TEMPERATURES' | translate}}</h4>
+            <p ng-if="!vm.info.temperatures.length" class="si-subtle">{{'ADMINCONSOLE.SYSTEM_INFO.UNAVAILABLE' | translate}}</p>
+            <p ng-repeat="sensor in vm.info.temperatures track by $index">{{sensor.name}}: {{sensor.celsius | number:1}} °C</p>
+        </section>
+
+    </div>
+    </div>
+
+    <div class="si-packages" ng-if="vm.activeView === 'packages'">
+        <p class="si-error" ng-if="vm.error">{{'ADMINCONSOLE.SYSTEM_INFO.LOAD_ERROR' | translate}}</p>
+        <section class="si-card si-package-card" ng-if="vm.info.packages">
+            <h3>{{'ADMINCONSOLE.SYSTEM_INFO.PACKAGES' | translate}}</h3>
+            <p class="si-subtle">{{'ADMINCONSOLE.SYSTEM_INFO.PACKAGE_LISTS_AT' | translate}}: {{vm.info.packages.packageListsAt ? (vm.info.packages.packageListsAt | date:'medium') : ('ADMINCONSOLE.SYSTEM_INFO.UNAVAILABLE' | translate)}}</p>
+            <div class="si-package-summary"><strong>{{vm.info.packages.updateCount === null ? '–' : vm.info.packages.updateCount}}</strong> {{'ADMINCONSOLE.SYSTEM_INFO.AVAILABLE_UPDATES' | translate}} <span>· {{vm.info.packages.firmwareUpdateCount === null ? '–' : vm.info.packages.firmwareUpdateCount}} {{'ADMINCONSOLE.SYSTEM_INFO.FIRMWARE_UPDATES' | translate}}</span></div>
+            <p class="si-subtle">{{'ADMINCONSOLE.SYSTEM_INFO.LOCAL_LISTS_ONLY' | translate}}</p>
+            <h4>{{'ADMINCONSOLE.SYSTEM_INFO.GUEST_TOOLS' | translate}}</h4>
+            <div class="si-version-row" ng-repeat="tool in vm.info.packages.guestTools track by tool.name">
+                <strong>{{tool.name}}</strong>
+                <span>{{'ADMINCONSOLE.SYSTEM_INFO.INSTALLED_VERSION' | translate}}: {{tool.version || ('ADMINCONSOLE.SYSTEM_INFO.NOT_INSTALLED' | translate)}}</span>
+                <span>{{'ADMINCONSOLE.SYSTEM_INFO.AVAILABLE_VERSION' | translate}}: {{tool.availableVersion || '–'}}</span>
+            </div>
+            <h4>{{'ADMINCONSOLE.SYSTEM_INFO.AVAILABLE_UPDATES' | translate}}</h4>
+            <p class="si-subtle" ng-if="!vm.info.packages.updates.length">{{'ADMINCONSOLE.SYSTEM_INFO.NONE_OR_UNKNOWN' | translate}}</p>
+            <div class="si-version-row" ng-repeat="update in vm.info.packages.updates track by update.name">
+                <strong>{{update.name}}</strong>
+                <span>{{'ADMINCONSOLE.SYSTEM_INFO.INSTALLED_VERSION' | translate}}: {{update.installedVersion || '–'}}</span>
+                <span>{{'ADMINCONSOLE.SYSTEM_INFO.AVAILABLE_VERSION' | translate}}: {{update.version}}</span>
+            </div>
+            <h4>{{'ADMINCONSOLE.SYSTEM_INFO.OFFICIAL_DEBIAN' | translate}}</h4>
+            <p class="si-subtle">{{'ADMINCONSOLE.SYSTEM_INFO.OFFICIAL_DEBIAN_NOTE' | translate}}</p>
+            <p class="si-subtle">{{'ADMINCONSOLE.SYSTEM_INFO.PACKAGE_LISTS_AT' | translate}}:
+                {{vm.info.packages.debianListsAt ? (vm.info.packages.debianListsAt | date:'medium') : ('ADMINCONSOLE.SYSTEM_INFO.UNAVAILABLE' | translate)}}</p>
+            <h4>{{'ADMINCONSOLE.SYSTEM_INFO.GUEST_TOOLS' | translate}}</h4>
+            <div class="si-version-row" ng-repeat="tool in vm.info.packages.debianGuestTools track by tool.name">
+                <strong>{{tool.name}}</strong>
+                <span>{{'ADMINCONSOLE.SYSTEM_INFO.INSTALLED_VERSION' | translate}}: {{tool.installedVersion || ('ADMINCONSOLE.SYSTEM_INFO.NOT_INSTALLED' | translate)}}</span>
+                <span>{{'ADMINCONSOLE.SYSTEM_INFO.AVAILABLE_VERSION' | translate}}: {{tool.availableVersion || '–'}}</span>
+            </div>
+            <h4>{{'ADMINCONSOLE.SYSTEM_INFO.FIRMWARE' | translate}}</h4>
+            <p class="si-subtle">{{'ADMINCONSOLE.SYSTEM_INFO.FIRMWARE_VM_NOTE' | translate}}</p>
+            <div class="si-version-row" ng-repeat="item in vm.info.packages.debianFirmware track by item.name">
+                <strong>{{item.name}}</strong>
+                <span>{{'ADMINCONSOLE.SYSTEM_INFO.INSTALLED_VERSION' | translate}}: {{item.installedVersion || ('ADMINCONSOLE.SYSTEM_INFO.NOT_INSTALLED' | translate)}}</span>
+                <span>{{'ADMINCONSOLE.SYSTEM_INFO.AVAILABLE_VERSION' | translate}}: {{item.availableVersion || '–'}}</span>
+            </div>
+            <h4>{{'ADMINCONSOLE.SYSTEM_INFO.PACKAGE_SOURCES' | translate}}</h4>
+            <p class="si-update" ng-repeat="source in vm.info.packages.sources track by $index">{{source.host}} <span>{{source.file}} · {{source.suite}}</span></p>
+        </section>
+    </div>
+
+    <div class="si-lists" ng-if="vm.activeView === 'lists'">
+        <div class="si-list-intro">
+            <div>
+                <h3>{{'ADMINCONSOLE.SYSTEM_INFO.LISTS' | translate}}</h3>
+                <p>{{'ADMINCONSOLE.SYSTEM_INFO.LISTS_DESCRIPTION' | translate}}</p>
+            </div>
+            <md-button class="md-raised" ng-click="vm.loadLists()" ng-disabled="vm.listsLoading">
+                {{'ADMINCONSOLE.SYSTEM_INFO.REFRESH' | translate}}
+            </md-button>
+        </div>
+        <p ng-if="vm.listsLoading">{{'ADMINCONSOLE.SYSTEM_INFO.LOADING' | translate}}</p>
+        <p class="si-error" ng-if="vm.listsError">{{'ADMINCONSOLE.SYSTEM_INFO.LOAD_ERROR' | translate}}</p>
+        <div ng-if="vm.listInfo">
+            <div class="si-list-summary">
+                <span><strong>{{vm.listInfo.listCount}}</strong> {{'ADMINCONSOLE.SYSTEM_INFO.LISTS' | translate}}</span>
+                <span><strong>{{vm.listInfo.blockedRequests === null ? '–' : (vm.listInfo.blockedRequests | number)}}</strong> {{'ADMINCONSOLE.SYSTEM_INFO.BLOCKED_REQUESTS' | translate}}</span>
+                <span ng-if="vm.listInfo.statsSince && !vm.listInfo.historicalImported">{{'ADMINCONSOLE.SYSTEM_INFO.SINCE' | translate}} {{vm.listInfo.statsSince | date:'medium'}}</span>
+                <span ng-if="vm.listInfo.historicalImported">{{'ADMINCONSOLE.SYSTEM_INFO.IMPORTED_HISTORY' | translate}}</span>
+            </div>
+            <div class="si-list-search">
+                <label for="si-search">{{'ADMINCONSOLE.SYSTEM_INFO.SEARCH_LISTS' | translate}}</label>
+                <input id="si-search" type="search" ng-model="vm.query"
+                       ng-model-options="{debounce: 500}" ng-change="vm.searchLists()"
+                       placeholder="{{'ADMINCONSOLE.SYSTEM_INFO.SEARCH_HINT' | translate}}" maxlength="80">
+                <small>{{'ADMINCONSOLE.SYSTEM_INFO.SEARCH_LIMIT' | translate}}</small>
+            </div>
+            <p ng-if="vm.searching">{{'ADMINCONSOLE.SYSTEM_INFO.SEARCHING' | translate}}</p>
+            <p class="si-error" ng-if="vm.searchError">{{'ADMINCONSOLE.SYSTEM_INFO.SEARCH_ERROR' | translate}}</p>
+            <div ng-if="vm.searchResult">
+                <p ng-if="!vm.searchResult.matches.length">{{'ADMINCONSOLE.SYSTEM_INFO.NO_MATCHES' | translate}}</p>
+                <section class="si-list-category" ng-repeat="match in vm.searchResult.matches track by match.id">
+                    <button class="si-list-toggle" type="button" ng-click="vm.toggleList(match.id, true)"
+                            ng-attr-aria-expanded="{{vm.listExpanded(match.id, true)}}">
+                        <span>{{vm.listExpanded(match.id, true) ? '▾' : '▸'}} {{vm.listName(match)}}</span>
+                        <small>{{('ADMINCONSOLE.SYSTEM_INFO.CATEGORY.' + match.category) | translate}} · {{match.entries.length}} {{'ADMINCONSOLE.SYSTEM_INFO.MATCHES' | translate}}</small>
+                    </button>
+                    <div ng-if="vm.listExpanded(match.id, true)">
+                        <p class="si-list-entry" ng-repeat="entry in match.entries track by $index">{{entry}}</p>
+                    </div>
+                </section>
+                <p class="si-subtle" ng-if="vm.searchResult.unsearchableLists">
+                    {{vm.searchResult.unsearchableLists}} {{'ADMINCONSOLE.SYSTEM_INFO.UNSEARCHABLE_LISTS' | translate}}
+                </p>
+            </div>
+            <div ng-if="!vm.searchResult">
+                <section class="si-list-category" ng-repeat="group in vm.listCategories track by group.name">
+                    <button class="si-list-toggle si-category-toggle" type="button"
+                            ng-click="vm.toggleCategory(group.name)"
+                            ng-attr-aria-expanded="{{vm.categoryExpanded(group.name)}}">
+                        <span>{{vm.categoryExpanded(group.name) ? '▾' : '▸'}} {{('ADMINCONSOLE.SYSTEM_INFO.CATEGORY.' + group.name) | translate}}</span>
+                        <small>{{group.items.length}}</small>
+                    </button>
+                    <div class="si-list-table-wrap" ng-if="vm.categoryExpanded(group.name)">
+                        <table class="si-list-table">
+                            <thead><tr>
+                                <th>{{'ADMINCONSOLE.SYSTEM_INFO.LIST_NAME' | translate}}</th>
+                                <th>{{'ADMINCONSOLE.SYSTEM_INFO.VERSION' | translate}}</th>
+                                <th>{{'ADMINCONSOLE.SYSTEM_INFO.UPDATED_AT' | translate}}</th>
+                                <th>{{'ADMINCONSOLE.SYSTEM_INFO.BLOCKED_REQUESTS' | translate}}</th>
+                                <th>{{'ADMINCONSOLE.SYSTEM_INFO.SEARCH_STATUS' | translate}}</th>
+                                <th>{{'ADMINCONSOLE.SYSTEM_INFO.ENTRIES' | translate}}</th>
+                            </tr></thead>
+                            <tbody>
+                                <tr ng-repeat="item in group.items track by item.id">
+                                    <th scope="row">{{vm.listName(item)}}</th>
+                                    <td>{{item.version || '–'}}</td>
+                                    <td>{{item.updatedAt ? (item.updatedAt | date:'medium') : '–'}}</td>
+                                    <td>{{item.blockedRequests === null || item.blockedRequests === undefined ? '–' : (item.blockedRequests | number)}}</td>
+                                    <td>{{(item.searchable ? 'ADMINCONSOLE.SYSTEM_INFO.SEARCHABLE' : 'ADMINCONSOLE.SYSTEM_INFO.NOT_SEARCHABLE') | translate}}</td>
+                                    <td>{{item.entryCount === null ? '–' : (item.entryCount | number)}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <div class="si-logs" ng-if="vm.activeView === 'logs'">
+        <div class="si-list-intro">
+            <div><h3>{{'ADMINCONSOLE.SYSTEM_INFO.LOGFILES' | translate}}</h3>
+                <p>{{'ADMINCONSOLE.SYSTEM_INFO.LOGFILES_DESCRIPTION' | translate}}</p></div>
+            <md-button class="md-raised" ng-click="vm.loadLogs()" ng-disabled="vm.logsLoading">
+                {{'ADMINCONSOLE.SYSTEM_INFO.REFRESH' | translate}}</md-button>
+        </div>
+        <p ng-if="vm.logsLoading">{{'ADMINCONSOLE.SYSTEM_INFO.LOGS_LOADING' | translate}}</p>
+        <p class="si-error" ng-if="vm.logsError">{{'ADMINCONSOLE.SYSTEM_INFO.LOGS_ERROR' | translate}}</p>
+        <p class="si-subtle">{{'ADMINCONSOLE.SYSTEM_INFO.LOGS_SCOPE' | translate}}</p>
+        <p class="si-error" ng-if="vm.logInaccessible.length">
+            {{'ADMINCONSOLE.SYSTEM_INFO.LOGS_INACCESSIBLE' | translate}}:
+            <span ng-repeat="path in vm.logInaccessible track by $index">{{path}}{{$last ? '' : ', '}}</span>
+        </p>
+        <section class="si-list-category" ng-repeat="file in vm.logFiles track by file.id">
+            <button class="si-list-toggle" type="button" ng-click="vm.toggleLog(file.id)"
+                    ng-attr-aria-expanded="{{vm.logExpanded(file.id)}}">
+                <span>{{vm.logExpanded(file.id) ? '▾' : '▸'}} {{file.id}}</span>
+                <small>{{file.sizeBytes | number}} B · {{file.modifiedAt | date:'medium'}}</small>
+            </button>
+            <div ng-if="vm.logExpanded(file.id)">
+                <div class="si-list-search">
+                    <label ng-attr-for="{{'si-log-' + $index}}">{{'ADMINCONSOLE.SYSTEM_INFO.SEARCH_LOG' | translate}}</label>
+                    <input ng-attr-id="{{'si-log-' + $index}}" type="search" ng-model="vm.logQueries[file.id]"
+                           ng-model-options="{debounce: 500}" ng-change="vm.readLog(file.id)"
+                           placeholder="{{'ADMINCONSOLE.SYSTEM_INFO.SEARCH_HINT' | translate}}" maxlength="80">
+                    <small>{{'ADMINCONSOLE.SYSTEM_INFO.LOG_SEARCH_NOTE' | translate}}</small>
+                </div>
+                <p class="si-error" ng-if="vm.logErrors[file.id]">{{'ADMINCONSOLE.SYSTEM_INFO.LOGS_ERROR' | translate}}</p>
+                <p class="si-subtle" ng-if="vm.logResults[file.id].windowTruncated">{{'ADMINCONSOLE.SYSTEM_INFO.LOG_WINDOW' | translate}}</p>
+                <p class="si-subtle" ng-if="vm.logResults[file.id] && !vm.logResults[file.id].lines.length">{{'ADMINCONSOLE.SYSTEM_INFO.NO_MATCHES' | translate}}</p>
+                <pre class="si-log-lines" ng-if="vm.logResults[file.id].lines.length"><span ng-repeat="line in vm.logResults[file.id].lines track by $index">{{line}}
+</span></pre>
+            </div>
+        </section>
+    </div>
+
+    <div class="si-ecosystem" ng-if="vm.activeView === 'eblocker'">
+        <div class="si-list-intro">
+            <div><h3>eBlocker</h3><p>{{'ADMINCONSOLE.SYSTEM_INFO.EBLOCKER_DESCRIPTION' | translate}}</p></div>
+            <md-button class="md-raised" ng-click="vm.loadEblocker()" ng-disabled="vm.eblockerLoading">
+                {{'ADMINCONSOLE.SYSTEM_INFO.REFRESH' | translate}}
+            </md-button>
+        </div>
+        <p ng-if="vm.eblockerLoading">{{'ADMINCONSOLE.SYSTEM_INFO.LOADING' | translate}}</p>
+        <p class="si-error" ng-if="vm.eblockerError">{{'ADMINCONSOLE.SYSTEM_INFO.LOAD_ERROR' | translate}}</p>
+        <div class="si-grid" ng-if="vm.eblockerInfo">
+            <section class="si-card">
+                <h3>{{'ADMINCONSOLE.SYSTEM_INFO.SERVICE_STATUS' | translate}}</h3>
+                <p>{{'ADMINCONSOLE.SYSTEM_INFO.CORE_STATE' | translate}}:
+                    {{('ADMINCONSOLE.SYSTEM_INFO.STATE.' + vm.eblockerInfo.executionState) | translate}}</p>
+                <div class="si-status-row" ng-repeat="service in vm.eblockerInfo.subsystems track by service.name">
+                    <span class="si-status-dot" ng-class="{'is-up': service.status === 'OK'}"></span>
+                    <span>{{('ADMINCONSOLE.SYSTEM_INFO.SUBSYSTEM.' + service.name) | translate}}</span>
+                    <strong>{{service.status}}</strong>
+                </div>
+                <p class="si-subtle">{{'ADMINCONSOLE.SYSTEM_INFO.DOCTOR_NOTE' | translate}}</p>
+            </section>
+            <section class="si-card">
+                <h3>{{'ADMINCONSOLE.SYSTEM_INFO.EBLOCKER_UPDATES' | translate}}</h3>
+                <dl>
+                    <dt>{{'ADMINCONSOLE.SYSTEM_INFO.LAST_UPDATE_ATTEMPT' | translate}}</dt>
+                    <dd>{{vm.eblockerInfo.updates.lastAttemptAt ? (vm.eblockerInfo.updates.lastAttemptAt | date:'medium') : '–'}}</dd>
+                    <dt>{{'ADMINCONSOLE.SYSTEM_INFO.AUTO_UPDATES' | translate}}</dt>
+                    <dd>{{(vm.eblockerInfo.updates.automaticEnabled ? 'ADMINCONSOLE.SYSTEM_INFO.YES' : 'ADMINCONSOLE.SYSTEM_INFO.NO') | translate}}</dd>
+                    <dt>{{'ADMINCONSOLE.SYSTEM_INFO.INSTALLED_LISTS_VERSION' | translate}}</dt>
+                    <dd>{{vm.eblockerInfo.updates.installedListsVersion || '–'}}</dd>
+                </dl>
+                <p class="si-subtle">{{'ADMINCONSOLE.SYSTEM_INFO.UPDATE_ATTEMPT_NOTE' | translate}}</p>
+            </section>
+            <section class="si-card">
+                <h3>{{'ADMINCONSOLE.SYSTEM_INFO.PROTECTION' | translate}}</h3>
+                <dl>
+                    <dt>DNS-Firewall</dt><dd>{{(vm.eblockerInfo.protection.dnsEnabled ? 'ADMINCONSOLE.SYSTEM_INFO.UP' : 'ADMINCONSOLE.SYSTEM_INFO.DOWN') | translate}}</dd>
+                    <dt>HTTPS</dt><dd>{{(vm.eblockerInfo.protection.httpsEnabled ? 'ADMINCONSOLE.SYSTEM_INFO.UP' : 'ADMINCONSOLE.SYSTEM_INFO.DOWN') | translate}}</dd>
+                    <dt>{{'ADMINCONSOLE.SYSTEM_INFO.KNOWN_DEVICES' | translate}}</dt><dd>{{vm.eblockerInfo.protection.knownDevices}}</dd>
+                    <dt>{{'ADMINCONSOLE.SYSTEM_INFO.ENABLED_DEVICES' | translate}}</dt><dd>{{vm.eblockerInfo.protection.enabledDevices}}</dd>
+                    <dt>{{'ADMINCONSOLE.SYSTEM_INFO.ADS_DEVICES' | translate}}</dt><dd>{{vm.eblockerInfo.protection.adsEnabledDevices}}</dd>
+                    <dt>{{'ADMINCONSOLE.SYSTEM_INFO.TRACKER_DEVICES' | translate}}</dt><dd>{{vm.eblockerInfo.protection.trackersEnabledDevices}}</dd>
+                    <dt>{{'ADMINCONSOLE.SYSTEM_INFO.MALWARE_DEVICES' | translate}}</dt><dd>{{vm.eblockerInfo.protection.malwareEnabledDevices}}</dd>
+                </dl>
+                <p class="si-subtle">{{'ADMINCONSOLE.SYSTEM_INFO.DEVICE_COUNT_NOTE' | translate}}</p>
+            </section>
+        </div>
+    </div>
+</div>

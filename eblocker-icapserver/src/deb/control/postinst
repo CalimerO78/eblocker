@@ -30,6 +30,9 @@ if [ "$1" = configure ] ; then
     systemctl enable eblocker-reset
     systemctl enable icapserver
 
+    # Keep the optional Debian metadata refresh manual on test hosts.
+    systemctl daemon-reload
+
     # Install network configuration import service
     systemctl enable eblocker-network-config-import
 

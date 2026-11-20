@@ -87,8 +87,8 @@ describe('App controlbar; Main controller', function() { // jshint ignore: line
         });
 
         it('should create a page for each entry (mockWindowService.innerWidth = 300)', function() { // jshint ignore: line
-            expect(ctrl.entries.length).toEqual(11);
-            expect(ctrl.allPages.length).toEqual(11);
+            expect(ctrl.entries.length).toEqual(12);
+            expect(ctrl.allPages.length).toEqual(12);
             expect(ctrl.currentPage).toEqual(0);
         });
     });

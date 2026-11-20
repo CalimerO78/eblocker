@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily isolated Debian package metadata refresh
+
+[Timer]
+OnCalendar=*-*-* 04:45:00
+RandomizedDelaySec=45m
+Persistent=true
+Unit=systeminfo-debian-refresh.service
+
+[Install]
+WantedBy=timers.target

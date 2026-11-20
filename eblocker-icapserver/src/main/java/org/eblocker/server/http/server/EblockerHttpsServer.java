@@ -75,6 +75,7 @@ import org.eblocker.server.http.controller.ReminderController;
 import org.eblocker.server.http.controller.RestoreFromBackupController;
 import org.eblocker.server.http.controller.SSLController;
 import org.eblocker.server.http.controller.SettingsController;
+import org.eblocker.server.http.controller.SystemInfoController;
 import org.eblocker.server.http.controller.SetupWizardController;
 import org.eblocker.server.http.controller.SplashController;
 import org.eblocker.server.http.controller.TasksController;
@@ -126,6 +127,7 @@ public class EblockerHttpsServer implements Preprocessor {
     private final StaticFileController staticFileController;
     private final DiagnosticsReportController diagnosticsReportController;
     private final SystemStatusController systemStatusController;
+    private final SystemInfoController systemInfoController;
 
     private final DeviceController deviceController;
     private final RedirectController redirectController;
@@ -198,6 +200,7 @@ public class EblockerHttpsServer implements Preprocessor {
                                StaticFileController staticFileController,
                                DiagnosticsReportController diagnosticsReportController,
                                SystemStatusController systemStatusController,
+                               SystemInfoController systemInfoController,
                                SSLContextHandler sslContextHandler,
 
                                // Controllers that are NOT available during boot phase
@@ -285,6 +288,7 @@ public class EblockerHttpsServer implements Preprocessor {
         this.staticFileController = staticFileController;
         this.diagnosticsReportController = diagnosticsReportController;
         this.systemStatusController = systemStatusController;
+        this.systemInfoController = systemInfoController;
         this.sslContextHandler = sslContextHandler;
 
         this.deviceController = deviceController;
@@ -1233,6 +1237,33 @@ public class EblockerHttpsServer implements Preprocessor {
                 .uri("/api/adminconsole/events/{mode}", eventController)
                 .action("deleteSeveralEvents", HttpMethod.DELETE)
                 .name("adminconsole.events.delete.route");
+
+        // Authenticated, read-only Systeminfo snapshot.
+        server
+                .uri("/api/adminconsole/systeminfo", systemInfoController)
+                .action("get", HttpMethod.GET)
+                .name("adminconsole.systeminfo.get.route");
+        server
+                .uri("/api/adminconsole/systeminfo/eblocker", systemInfoController)
+                .action("getEblocker", HttpMethod.GET)
+                .name("adminconsole.systeminfo.eblocker.get.route");
+        server
+                .uri("/api/adminconsole/systeminfo/lists", systemInfoController)
+                .action("getLists", HttpMethod.GET)
+                .name("adminconsole.systeminfo.lists.get.route");
+        server
+                .uri("/api/adminconsole/systeminfo/lists/search", systemInfoController)
+                .action("searchLists", HttpMethod.GET)
+                .name("adminconsole.systeminfo.lists.search.route");
+
+        server
+                .uri("/api/adminconsole/systeminfo/logs", systemInfoController)
+                .action("getLogs", HttpMethod.GET)
+                .name("adminconsole.systeminfo.logs.get.route");
+        server
+                .uri("/api/adminconsole/systeminfo/logs/read", systemInfoController)
+                .action("readLog", HttpMethod.GET)
+                .name("adminconsole.systeminfo.logs.read.route");
 
         // ** New Adminconsole: System Diagnostics Report
         server
