@@ -77,6 +77,23 @@ public class SystemInfoServiceTest {
         Assert.assertEquals(List.of(), snapshot.get("temperatures"));
     }
 
+    @SuppressWarnings("unchecked")
+    @Test
+    public void embeddedBuildProvenanceOverridesStaleLocalManifest() throws Exception {
+        Path root = folder.newFolder().toPath();
+        Path etc = Files.createDirectories(root.resolve("etc/eblocker"));
+        Files.writeString(etc.resolve("systeminfo-build.properties"),
+                "baseRevision=old-revision\n" +
+                "enhancements=old-feature\n" +
+                "buildId=old-build\n");
+
+        Map<String, Object> snapshot = new SystemInfoService("4.1.0", root, root.resolve("etc"), root,
+                Clock.systemUTC(), null).getSnapshot();
+        Map<String, Object> build = (Map<String, Object>) snapshot.get("build");
+        Assert.assertEquals("6dd560a666d10f804b943f56192cfa306b60d7c2", build.get("baseRevision"));
+        Assert.assertNotEquals("old-build", build.get("buildId"));
+    }
+
     @Test
     public void decodesIpv4AndIpv6DefaultGateways() throws Exception {
         Path root = folder.newFolder().toPath();
