@@ -1,6 +1,8 @@
 <div layout="column" layout-fill class="settings-child-view">
     <div layout-padding>
 
+        <eb-help-icon template="app/components/wireguard/help-wireguard-lite.template.html"></eb-help-icon>
+
         <div layout="row" layout-align="start center">
             <md-switch md-theme="eBlockerThemeSwitch"
                        class="md-primary"
@@ -12,6 +14,7 @@
                     'ADMINCONSOLE.WIREGUARD.SWITCH.ON' :
                     'ADMINCONSOLE.WIREGUARD.SWITCH.OFF') | translate
                 }}
+                <md-tooltip md-delay="300">{{'ADMINCONSOLE.WIREGUARD.TOOLTIP.SWITCH' | translate}}</md-tooltip>
             </md-switch>
 
             <md-button class="md-raised md-secondary"
@@ -27,28 +30,6 @@
                                       md-diameter="32">
                 </md-progress-circular>
             </div>
-        </div>
-
-        <div flex-gt-lg="65"
-             flex-md="75"
-             flex-lg="75"
-             class="config-frame md-whiteframe-z1">
-
-            <h3 style="margin-top: 0;"
-                translate="ADMINCONSOLE.WIREGUARD.SETUP.TITLE">
-            </h3>
-
-            <ol style="margin-top: 0; padding-left: 24px;">
-                <li translate="ADMINCONSOLE.WIREGUARD.SETUP.STEP_1"></li>
-                <li translate="ADMINCONSOLE.WIREGUARD.SETUP.STEP_2"></li>
-                <li translate="ADMINCONSOLE.WIREGUARD.SETUP.STEP_3"></li>
-                <li translate="ADMINCONSOLE.WIREGUARD.SETUP.STEP_4"></li>
-                <li translate="ADMINCONSOLE.WIREGUARD.SETUP.STEP_5"></li>
-                <li translate="ADMINCONSOLE.WIREGUARD.SETUP.STEP_6"></li>
-            </ol>
-            <p style="margin-bottom: 0;"
-               translate="ADMINCONSOLE.WIREGUARD.SETUP.WAN_HINT">
-            </p>
         </div>
 
         <div flex-gt-lg="65"
@@ -83,6 +64,7 @@
                                     }}
                                 </md-option>
                             </md-select>
+                            <md-tooltip md-delay="300">{{'ADMINCONSOLE.WIREGUARD.TOOLTIP.ENDPOINT_TYPE' | translate}}</md-tooltip>
                         </md-input-container>
                     </div>
 
@@ -95,6 +77,7 @@
 
                             <input ng-model="vm.endpoint.host"
                                    ng-required="vm.endpointHostRequired()">
+                            <md-tooltip md-delay="300">{{'ADMINCONSOLE.WIREGUARD.TOOLTIP.ENDPOINT_HOST' | translate}}</md-tooltip>
                         </md-input-container>
                     </div>
                 </div>
@@ -117,72 +100,6 @@
             </form>
         </div>
 
-        <div flex-gt-lg="65"
-             flex-md="75"
-             flex-lg="75"
-             class="config-frame md-whiteframe-z1">
-
-            <h3 style="margin-top: 0;"
-                translate="ADMINCONSOLE.WIREGUARD.STATUS.TITLE">
-            </h3>
-
-            <div layout="row" layout-xs="column" flex>
-                <div flex-gt-xs="33">
-                    <eb-label-container
-                        label="{{ 'ADMINCONSOLE.WIREGUARD.STATUS.INTERFACE' | translate }}"
-                        config="vm.interfaceConfig">
-                    </eb-label-container>
-                </div>
-
-                <div flex-gt-xs="33">
-                    <eb-label-container
-                        label="{{ 'ADMINCONSOLE.WIREGUARD.STATUS.SERVICE' | translate }}"
-                        config="vm.serviceConfig">
-                    </eb-label-container>
-                </div>
-
-                <div flex-gt-xs="33">
-                    <eb-label-container
-                        label="{{ 'ADMINCONSOLE.WIREGUARD.STATUS.WG' | translate }}"
-                        config="vm.wgConfig">
-                    </eb-label-container>
-                </div>
-            </div>
-
-            <div layout="row" layout-xs="column" flex>
-                <div flex-gt-xs="33">
-                    <eb-label-container
-                        label="{{ 'ADMINCONSOLE.WIREGUARD.STATUS.PEERS' | translate }}"
-                        config="vm.peersConfig">
-                    </eb-label-container>
-                </div>
-
-                <div flex-gt-xs="33">
-                    <eb-label-container
-                        label="{{ 'ADMINCONSOLE.WIREGUARD.STATUS.PORT' | translate }}"
-                        config="vm.portConfig">
-                    </eb-label-container>
-                </div>
-            </div>
-
-            <div ng-if="vm.status.runtime.error"
-                 class="content-error"
-                 style="margin-top: 12px;">
-                {{ vm.status.runtime.error }}
-            </div>
-        </div>
-
-        <div ng-if="!vm.status.enabled"
-             flex-gt-lg="65"
-             flex-md="75"
-             flex-lg="75"
-             class="config-frame md-whiteframe-z1">
-            <strong translate="ADMINCONSOLE.WIREGUARD.DISABLED_STATE.TITLE"></strong>
-            <div style="margin-top: 4px;"
-                 translate="ADMINCONSOLE.WIREGUARD.DISABLED_STATE.TEXT">
-            </div>
-        </div>
-
         <div id="wireguard-client-profiles" flex-gt-lg="65"
              flex-md="75"
              flex-lg="75"
@@ -192,8 +109,6 @@
             <h3 style="margin-top: 0;"
                 translate="ADMINCONSOLE.WIREGUARD.PROVISIONING.TITLE">
             </h3>
-
-            <p translate="ADMINCONSOLE.WIREGUARD.PROVISIONING.DESCRIPTION"></p>
 
             <p ng-if="!vm.isEndpointConfigured()"
                class="content-error"
@@ -214,9 +129,17 @@
                         {{ device.displayName || device.name }}
                     </md-option>
                 </md-select>
+                <md-tooltip md-delay="300">{{'ADMINCONSOLE.WIREGUARD.TOOLTIP.DEVICE' | translate}}</md-tooltip>
             </md-input-container>
 
             <div ng-if="vm.provisioning.selectedDeviceId" style="margin: 0 0 12px 0;">
+                <md-switch ng-if="!vm.authorizationLoading && vm.selectedDeviceAuthorization()"
+                           ng-model="vm.provisioning.deviceAccessEnabled"
+                           ng-change="vm.setSelectedDeviceAccess()"
+                           ng-disabled="vm.provisioning.isUpdatingDeviceAccess || vm.isLoading">
+                    {{'ADMINCONSOLE.WIREGUARD.PROVISIONING.DEVICE_ACCESS' | translate}}
+                    <md-tooltip md-delay="300">{{'ADMINCONSOLE.WIREGUARD.TOOLTIP.DEVICE_ACCESS' | translate}}</md-tooltip>
+                </md-switch>
                 <strong>{{ 'ADMINCONSOLE.VPN_ACCESS.EFFECTIVE' | translate }}:</strong>
                 <span ng-if="vm.authorizationLoading">{{ 'ADMINCONSOLE.VPN_ACCESS.UNKNOWN' | translate }}</span>
                 <span ng-if="!vm.authorizationLoading">{{ vm.authorizationStateKey(vm.selectedDeviceAuthorization()) | translate }}</span>
@@ -287,8 +210,8 @@
                         ng-change="vm.updateProvisioningLanAccess()"
                         ng-disabled="vm.isProvisioningBusy()">
                         {{ 'ADMINCONSOLE.WIREGUARD.PROVISIONING.LAN_ACCESS' | translate }}
+                        <md-tooltip md-delay="300">{{'ADMINCONSOLE.WIREGUARD.PROVISIONING.LAN_HINT' | translate}}</md-tooltip>
                     </md-switch>
-                    <p translate="ADMINCONSOLE.WIREGUARD.PROVISIONING.LAN_HINT"></p>
                 </div>
 
                 <div style="margin-top: 12px;">
@@ -297,12 +220,14 @@
                                ng-disabled="vm.isProvisioningBusy() ||
                                             !vm.isEndpointConfigured()">
                         {{ 'ADMINCONSOLE.WIREGUARD.PROVISIONING.SHOW_QR' | translate }}
+                        <md-tooltip md-delay="300">{{'ADMINCONSOLE.WIREGUARD.TOOLTIP.QR' | translate}}</md-tooltip>
                     </md-button>
                     <md-button class="md-raised md-secondary"
                                ng-click="vm.downloadProvisioningConfig()"
                                ng-disabled="vm.isProvisioningBusy() ||
                                             !vm.isEndpointConfigured()">
                         {{ 'ADMINCONSOLE.WIREGUARD.PROVISIONING.DOWNLOAD_CONFIG' | translate }}
+                        <md-tooltip md-delay="300">{{'ADMINCONSOLE.WIREGUARD.TOOLTIP.DOWNLOAD' | translate}}</md-tooltip>
                     </md-button>
                 </div>
 
@@ -311,11 +236,13 @@
                                ng-click="vm.confirmRegenerateProvisionedPeer($event)"
                                ng-disabled="vm.isProvisioningBusy()">
                         {{ 'ADMINCONSOLE.WIREGUARD.PROVISIONING.REGENERATE' | translate }}
+                        <md-tooltip md-delay="300">{{'ADMINCONSOLE.WIREGUARD.TOOLTIP.REGENERATE' | translate}}</md-tooltip>
                     </md-button>
                     <md-button class="md-raised md-warn"
                                ng-click="vm.confirmDeleteProvisionedPeer($event)"
                                ng-disabled="vm.isProvisioningBusy()">
                         {{ 'ADMINCONSOLE.WIREGUARD.PROVISIONING.DELETE' | translate }}
+                        <md-tooltip md-delay="300">{{'ADMINCONSOLE.WIREGUARD.TOOLTIP.DELETE' | translate}}</md-tooltip>
                     </md-button>
                 </div>
 
@@ -339,5 +266,7 @@
             </div>
         </div>
 
+        <div class="content-error" ng-if="vm.status.runtime.error">{{vm.status.runtime.error}}</div>
+        <vpn-log-reader-component protocol="wireguard"></vpn-log-reader-component>
     </div>
 </div>

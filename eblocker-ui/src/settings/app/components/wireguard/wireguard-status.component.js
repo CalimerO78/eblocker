@@ -68,12 +68,6 @@ function Controller(WireGuardService, DeviceService, DialogService, // jshint ig
         vm.isToggling = false;
         vm.isSavingEndpoint = false;
 
-        vm.interfaceConfig = {value: '-'};
-        vm.serviceConfig = {value: '-'};
-        vm.wgConfig = {value: '-'};
-        vm.peersConfig = {value: 0};
-        vm.portConfig = {value: 'UDP 51820'};
-
         vm.toggleServer = toggleServer;
         vm.saveEndpoint = saveEndpoint;
         vm.endpointHostRequired = endpointHostRequired;
@@ -84,6 +78,7 @@ function Controller(WireGuardService, DeviceService, DialogService, // jshint ig
         vm.selectedDeviceAuthorization = selectedDeviceAuthorization;
         vm.authorizationStateKey = authorizationStateKey;
         vm.authorizationDetailKey = authorizationDetailKey;
+        vm.setSelectedDeviceAccess = setSelectedDeviceAccess;
     }
 
     function initializeProvisioningUi() {
@@ -95,6 +90,8 @@ function Controller(WireGuardService, DeviceService, DialogService, // jshint ig
             isLoadingQr: false,
             isDownloading: false,
             isSavingLanAccess: false,
+            isUpdatingDeviceAccess: false,
+            deviceAccessEnabled: undefined,
             isDeleting: false,
             isRegenerating: false
         };
@@ -155,7 +152,6 @@ function Controller(WireGuardService, DeviceService, DialogService, // jshint ig
         const statusPromise = WireGuardService.getStatus()
             .then(function(response) {
                 vm.status = response.data;
-                updateStatusDisplay();
             })
             .catch(function(response) {
                 NotificationService.error(
@@ -305,18 +301,43 @@ function Controller(WireGuardService, DeviceService, DialogService, // jshint ig
                     }
                 });
                 vm.deviceAuthorizationMap = authorizationMap;
+                const selected = selectedDeviceAuthorization();
+                vm.provisioning.deviceAccessEnabled = selected ? selected.deviceEnabled === true : undefined;
             })
             .catch(function(response) {
                 if (requestVersion !== vm.authorizationRequestVersion) {
                     return;
                 }
                 vm.deviceAuthorizationMap = {};
+                vm.provisioning.deviceAccessEnabled = undefined;
                 NotificationService.error('ADMINCONSOLE.VPN_ACCESS.NOTIFICATION.LOAD_ERROR', response);
             })
             .finally(function() {
                 if (requestVersion === vm.authorizationRequestVersion) {
                     vm.authorizationLoading = false;
                 }
+            });
+    }
+
+    function setSelectedDeviceAccess() {
+        const deviceId = vm.provisioning.selectedDeviceId;
+        const desired = vm.provisioning.deviceAccessEnabled === true;
+        if (!angular.isString(deviceId) || !selectedDeviceAuthorization() ||
+                vm.provisioning.isUpdatingDeviceAccess) {
+            return $q.reject('WireGuard device authorization is unavailable.');
+        }
+        vm.provisioning.isUpdatingDeviceAccess = true;
+        return WireGuardService.setDeviceAuthorization(deviceId, desired)
+            .then(function() { return loadDeviceAuthorizations(); })
+            .catch(function(response) {
+                vm.provisioning.deviceAccessEnabled = undefined;
+                NotificationService.error(
+                    'ADMINCONSOLE.VPN_ACCESS.NOTIFICATION.WIREGUARD_DEVICE_ERROR', response);
+                // The backend may have saved the change before reporting a runtime error.
+                return loadDeviceAuthorizations();
+            })
+            .finally(function() {
+                vm.provisioning.isUpdatingDeviceAccess = false;
             });
     }
 
@@ -386,6 +407,8 @@ function Controller(WireGuardService, DeviceService, DialogService, // jshint ig
 
         vm.provisioning.selectedPeer =
             findPeerRowByDeviceId(vm.provisioning.selectedDeviceId) || null;
+        const selected = selectedDeviceAuthorization();
+        vm.provisioning.deviceAccessEnabled = selected ? selected.deviceEnabled === true : undefined;
 
         if (!vm.provisioning.selectedPeer) {
             revokeProvisioningQrUrl();
@@ -903,7 +926,6 @@ function Controller(WireGuardService, DeviceService, DialogService, // jshint ig
         return action()
             .then(function(response) {
                 vm.status = response.data;
-                updateStatusDisplay();
                 return loadDeviceAuthorizations();
             })
             .catch(function(response) {
@@ -917,17 +939,6 @@ function Controller(WireGuardService, DeviceService, DialogService, // jshint ig
             .finally(function() {
                 vm.isToggling = false;
             });
-    }
-
-    function updateStatusDisplay() {
-        const runtime = vm.status.runtime || {};
-
-        vm.interfaceConfig.value = runtime.iface || '-';
-        vm.serviceConfig.value = runtime.service || '-';
-        vm.wgConfig.value = runtime.wg || '-';
-        vm.peersConfig.value = angular.isNumber(runtime.peers) ?
-            runtime.peers :
-            0;
     }
 
     function endpointHostRequired() {
@@ -991,6 +1002,7 @@ function provisioningBusy(provisioning) {
         provisioning.isLoadingQr ||
         provisioning.isDownloading ||
         provisioning.isSavingLanAccess ||
+        provisioning.isUpdatingDeviceAccess ||
         provisioning.isDeleting ||
         provisioning.isRegenerating;
 }

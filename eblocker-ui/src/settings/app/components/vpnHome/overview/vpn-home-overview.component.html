@@ -1,0 +1,66 @@
+<div layout="column" layout-fill class="settings-child-view vpn-mobile-overview">
+    <div layout-padding>
+        <eb-help-icon template="app/components/vpnHome/overview/help-vpn-home-overview.template.html"></eb-help-icon>
+        <div class="vpn-overview-heading">
+            <div>
+                <h2>{{'ADMINCONSOLE.VPN_HOME_OVERVIEW.TITLE' | translate}}</h2>
+                <small ng-if="vm.checkedAt">{{'ADMINCONSOLE.VPN_HOME_OVERVIEW.CHECKED_AT' | translate}}: {{vm.checkedAt | date:'shortTime'}}</small>
+            </div>
+            <md-button class="md-raised" ng-click="vm.refresh()" ng-disabled="vm.loading">
+                {{'ADMINCONSOLE.SYSTEM_INFO.REFRESH' | translate}}
+            </md-button>
+        </div>
+
+        <div class="vpn-overview-grid">
+            <section class="vpn-overview-card">
+                <div class="vpn-overview-card-head"><h3>OpenVPN</h3>
+                    <span class="vpn-overview-badge" ng-class="'is-' + vm.state('openvpn').toLowerCase()">
+                        {{('ADMINCONSOLE.VPN_HOME_OVERVIEW.STATES.' + vm.state('openvpn')) | translate}}
+                    </span>
+                </div>
+                <small>{{'ADMINCONSOLE.VPN_HOME_OVERVIEW.OPENVPN_DETAIL' | translate}}
+                    <md-tooltip md-delay="300">{{'ADMINCONSOLE.VPN_HOME_OVERVIEW.HELP.OPENVPN' | translate}}</md-tooltip>
+                </small>
+            </section>
+
+            <section class="vpn-overview-card">
+                <div class="vpn-overview-card-head"><h3>WireGuard</h3>
+                    <span class="vpn-overview-badge" ng-class="'is-' + vm.state('wireguard').toLowerCase()">
+                        {{('ADMINCONSOLE.VPN_HOME_OVERVIEW.STATES.' + vm.state('wireguard')) | translate}}
+                    </span>
+                </div>
+                <small ng-if="vm.status.wireguard && vm.status.wireguard.runtime && vm.state('wireguard') === 'RUNNING'">
+                    {{'ADMINCONSOLE.VPN_HOME_OVERVIEW.PEERS' | translate}}: {{vm.status.wireguard.runtime.peers || 0}}
+                </small>
+                <p class="content-error" ng-if="vm.status.wireguard.runtime.error">{{vm.status.wireguard.runtime.error}}</p>
+            </section>
+
+            <section class="vpn-overview-card">
+                <div class="vpn-overview-card-head"><h3>{{'ADMINCONSOLE.VPN_HOME_OVERVIEW.DYNDNS' | translate}}</h3>
+                    <span class="vpn-overview-badge" ng-class="'is-' + vm.state('dyndns').toLowerCase()">
+                        {{('ADMINCONSOLE.VPN_HOME_OVERVIEW.STATES.' + vm.state('dyndns')) | translate}}
+                    </span>
+                </div>
+                <div class="vpn-overview-value" ng-if="vm.status.dyndns && vm.status.dyndns.hostname">{{vm.status.dyndns.hostname}}</div>
+                <small ng-if="!vm.status.dyndns || !vm.status.dyndns.hostname">{{'ADMINCONSOLE.VPN_HOME_OVERVIEW.HELP.DYNDNS' | translate}}</small>
+            </section>
+
+            <section class="vpn-overview-card">
+                <div class="vpn-overview-card-head"><h3>{{'ADMINCONSOLE.VPN_HOME_OVERVIEW.EXTERNAL_IP' | translate}}</h3></div>
+                <div class="vpn-overview-value">{{vm.status.dyndns.reportedIpAddress || ('ADMINCONSOLE.VPN_HOME_OVERVIEW.STATES.UNKNOWN' | translate)}}</div>
+                <small>{{'ADMINCONSOLE.VPN_HOME_OVERVIEW.IP_NOTE' | translate}}
+                    <md-tooltip md-delay="300">{{'ADMINCONSOLE.VPN_HOME_OVERVIEW.HELP.EXTERNAL_IP' | translate}}</md-tooltip>
+                </small>
+            </section>
+
+            <section class="vpn-overview-card">
+                <div class="vpn-overview-card-head"><h3>{{'ADMINCONSOLE.VPN_HOME_OVERVIEW.CERTIFICATE' | translate}}</h3>
+                    <span class="vpn-overview-badge" ng-class="'is-' + vm.state('certificate').toLowerCase()">
+                        {{('ADMINCONSOLE.VPN_HOME_OVERVIEW.STATES.' + vm.state('certificate')) | translate}}
+                    </span>
+                </div>
+                <small>{{'ADMINCONSOLE.VPN_HOME_OVERVIEW.HELP.CERTIFICATE' | translate}}</small>
+            </section>
+        </div>
+    </div>
+</div>

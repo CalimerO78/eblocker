@@ -3686,6 +3686,17 @@
     },
     "WIREGUARD": {
             "LABEL": "WireGuard",
+            "TOOLTIP": {
+    "SWITCH": "WireGuard starten oder stoppen. Gespeicherte Profile bleiben erhalten.",
+    "ENDPOINT_TYPE": "Festlegen, wie Clients den eBlocker von außerhalb erreichen.",
+    "ENDPOINT_HOST": "Öffentliche IP-Adresse oder DNS-Namen eingeben, den Clients verwenden.",
+    "DEVICE": "Das eBlocker-Gerät auswählen, das dieses WireGuard-Profil erhalten soll.",
+    "DEVICE_ACCESS": "Dieses Gerät für WireGuard freigeben. Eine Benutzerfreigabe kann ebenfalls Zugriff gewähren.",
+    "QR": "Private Clientkonfiguration als QR-Code für den Import auf dem Zielgerät anzeigen.",
+    "DOWNLOAD": "Private Clientkonfiguration als .conf-Datei herunterladen.",
+    "REGENERATE": "Profilschlüssel ersetzen. Bisher importierte Konfigurationen funktionieren danach nicht mehr.",
+    "DELETE": "Dieses Clientprofil widerrufen und löschen."
+},
             "SWITCH": {
                 "ON": "WireGuard an",
                 "OFF": "WireGuard aus"
@@ -3698,9 +3709,9 @@
                 "TITLE": "WireGuard einrichten",
                 "STEP_1": "WireGuard einschalten.",
                 "STEP_2": "Externen Zugriff mit öffentlicher IP-Adresse oder DNS-Namen konfigurieren.",
-                "STEP_3": "Unter Geräte → VPN-Zugriff das Zielgerät oder seinen Benutzer freigeben.",
+                "STEP_3": "Das ausgewählte Gerät bei den Clientprofilen für WireGuard freigeben.",
                 "STEP_4": "Clientprofil erstellen.",
-                "STEP_5": "Tunnelmodus wählen.",
+                "STEP_5": "Entscheiden, ob dieser Client auf das lokale Netzwerk zugreifen darf.",
                 "STEP_6": "QR-Code scannen oder .conf in der WireGuard-App importieren.",
                 "WAN_HINT": "Für Verbindungen aus dem Internet muss UDP 51820 im Router an den eBlocker weitergeleitet werden."
             },
@@ -3755,6 +3766,7 @@
                 "TITLE": "WireGuard-Clientprofile",
                 "DESCRIPTION": "Hier kann ein WireGuard-Profil für ein bestimmtes eBlocker-Gerät erstellt und auf einem zweiten Bildschirm als QR-Code angezeigt werden. Das Zielgerät scannt den QR-Code anschließend direkt mit der WireGuard-App.",
                 "DEVICE": "Zielgerät",
+                "DEVICE_ACCESS": "WireGuard für dieses Gerät erlauben",
                 "NO_DEVICES": "Es sind keine Geräte für die WireGuard-Einrichtung verfügbar.",
                 "NO_PROFILE": "Für dieses Gerät ist noch kein WireGuard-Clientprofil vorhanden.",
                 "CREATE": "Clientprofil erstellen",
@@ -3822,29 +3834,40 @@
                 "ENDPOINT_SAVED": "WireGuard-Endpunktkonfiguration gespeichert."
             }
         },
-        "VPN_HOME_DYNDNS": {
-            "LABEL": "DynDNS",
-            "TITLE": "Externer Zugriff / DynDNS",
-            "PLACEHOLDER": "Die gemeinsame DynDNS-Konfiguration für eBlocker Mobile wird hier eingerichtet."
-        },
-        "VPN_HOME_OPENVPN": {
-            "LABEL": "OpenVPN"
-        },
-        "VPN_HOME_TESTS": {
-            "LABEL": "Tests",
-            "TITLE": "Tests und Diagnose",
-            "PLACEHOLDER": "Gemeinsame Verbindungs- und Diagnosetests für OpenVPN und WireGuard werden hier zusammengeführt.",
-            "UNKNOWN": "Unbekannt",
-            "RUNNING": "Läuft",
-            "STOPPED": "Gestoppt",
-            "EXTERNAL_IP": "Externe IP",
-            "IP_NOTE": "Zuletzt an eBlocker DynDNS gemeldete Adresse; keine Live-WAN-Prüfung.",
-            "CERTIFICATE": "eBlocker-HTTPS-Zertifikat",
-            "READY": "Bereit",
-            "NOT_READY": "Nicht bereit",
-            "LOG_READER": "Log-Anzeige",
-            "LOG_FILE": "Logdatei"
-        }
+        "VPN_HOME_OVERVIEW": {
+    "LABEL": "Status",
+    "TITLE": "eBlocker Mobile Status",
+    "CHECKED_AT": "Geprüft",
+    "STATES": {
+        "UNKNOWN": "Unbekannt",
+        "RUNNING": "Läuft",
+        "STOPPED": "Aus",
+        "ERROR": "Prüfen",
+        "ENABLED": "Aktiviert",
+        "READY": "Bereit",
+        "NOT_READY": "Nicht bereit"
+    },
+    "OPENVPN_DETAIL": "OpenVPN-Server",
+    "PEERS": "Konfigurierte Peers",
+    "DYNDNS": "eBlocker DynDNS",
+    "EXTERNAL_IP": "Externe IP",
+    "IP_NOTE": "Zuletzt gemeldete Adresse",
+    "CERTIFICATE": "eBlocker-HTTPS-Zertifikat",
+    "HELP": {
+        "INTRO": "Diese Ansicht zeigt die aktuellen eBlocker-Mobile-Einstellungen und Dienstzustände. Sie prüft nicht die Erreichbarkeit aus dem Internet.",
+        "OPENVPN": "Zeigt, ob der OpenVPN-Server läuft. Ein Verbindungstest ist im Reiter OpenVPN verfügbar.",
+        "WIREGUARD": "„Läuft“ setzt einen aktiven WireGuard-Dienst und eine aktive Schnittstelle voraus. Die Peer-Zahl belegt keine bestehende Clientverbindung.",
+        "DYNDNS": "Zeigt nur den eingebauten eBlocker-DynDNS-Dienst. Ein anderer DNS-Anbieter wird separat in den VPN-Einstellungen konfiguriert.",
+        "EXTERNAL_IP": "Dies ist die zuletzt an eBlocker DynDNS gemeldete IP, keine aktuelle WAN-Messung. Ohne Meldung bleibt der Wert unbekannt.",
+        "CERTIFICATE": "Zeigt die Bereitschaft des eBlocker-HTTPS-Zertifikats. WireGuard verwendet dieses Zertifikat nicht."
+    }
+},
+        "VPN_LOGS": {
+    "TITLE": "VPN-Protokoll",
+    "FILE": "Logdatei",
+    "SEARCH_HELP": "Suche in der gewählten VPN-Logdatei. Mindestens drei Zeichen eingeben oder für die letzten Zeilen leer lassen."
+},
+        "VPN_HOME_OPENVPN": {"LABEL": "OpenVPN"}
     },
     "HELP_ICON": {
         "ANON": {

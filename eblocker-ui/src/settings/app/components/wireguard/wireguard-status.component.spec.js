@@ -91,7 +91,8 @@ describe('App settings; WireGuard status component controller', function() { // 
                 jasmine.createSpy('getQrCode'),
             getEndpoint: jasmine.createSpy('getEndpoint'),
             setEndpoint: jasmine.createSpy('setEndpoint'),
-            getDeviceAuthorizations: jasmine.createSpy('getDeviceAuthorizations')
+            getDeviceAuthorizations: jasmine.createSpy('getDeviceAuthorizations'),
+            setDeviceAuthorization: jasmine.createSpy('setDeviceAuthorization')
         };
 
         DeviceService = {
@@ -227,12 +228,6 @@ describe('App settings; WireGuard status component controller', function() { // 
             .toBe('vpn.example.test');
         expect(ctrl.isEndpointConfigured()).toBe(true);
 
-        expect(ctrl.interfaceConfig.value).toBe('up');
-        expect(ctrl.serviceConfig.value).toBe('active');
-        expect(ctrl.wgConfig.value).toBe('ready');
-        expect(ctrl.peersConfig.value).toBe(2);
-        expect(ctrl.portConfig.value).toBe('UDP 51820');
-
         expect(ctrl.peerRows.length).toBe(2);
 
         expect(ctrl.peerRows[0].deviceDisplayName)
@@ -261,6 +256,24 @@ describe('App settings; WireGuard status component controller', function() { // 
             .toBe('device:test-phone');
         expect(ctrl.provisioning.selectedPeer.id)
             .toBe(2);
+        expect(ctrl.provisioning.deviceAccessEnabled).toBe(false);
+    });
+
+    it('updates the selected device permission and reloads the effective decision', function() {
+        ctrl.$onInit();
+        $rootScope.$digest();
+        WireGuardService.setDeviceAuthorization.and.returnValue($q.when({data: {}}));
+        WireGuardService.getDeviceAuthorizations.and.returnValue($q.when({data: {devices: [{
+            deviceId: 'device:test-phone', deviceEnabled: true, allowed: true,
+            userEnabled: true, globalEnabled: true
+        }]}}));
+        ctrl.provisioning.deviceAccessEnabled = true;
+        ctrl.setSelectedDeviceAccess();
+        $rootScope.$digest();
+        expect(WireGuardService.setDeviceAuthorization)
+            .toHaveBeenCalledWith('device:test-phone', true);
+        expect(ctrl.provisioning.deviceAccessEnabled).toBe(true);
+        expect(ctrl.selectedDeviceAuthorization().allowed).toBe(true);
     });
 
     it('creates a device-bound peer for the selected device', function() {

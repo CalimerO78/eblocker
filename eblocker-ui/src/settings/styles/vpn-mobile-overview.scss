@@ -1,0 +1,63 @@
+.vpn-mobile-overview {
+    .vpn-overview-heading {
+        max-width: 900px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        padding-right: 100px;
+        margin-bottom: 18px;
+    }
+    .vpn-overview-heading h2 { margin: 0 0 4px; font-size: 24px; }
+    .vpn-overview-heading small { color: #697783; }
+    .vpn-overview-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        max-width: 900px;
+    }
+    .vpn-overview-card {
+        min-width: 0;
+        min-height: 90px;
+        border: 1px solid #e5e9ec;
+        border-radius: 10px;
+        background: #fff;
+        padding: 18px 20px;
+        box-shadow: 0 2px 12px rgba(25, 38, 49, .045);
+    }
+    .vpn-overview-card-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+    .vpn-overview-card h3 { margin: 0; font-size: 16px; font-weight: 600; }
+    .vpn-overview-card small { color: #697783; font-size: 12px; }
+    .vpn-overview-value { overflow-wrap: anywhere; font-size: 17px; margin-bottom: 5px; }
+    .vpn-overview-badge {
+        border-radius: 16px;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: 600;
+        background: #edf1f3;
+        color: #56636c;
+    }
+    .vpn-overview-badge.is-running,
+    .vpn-overview-badge.is-ready,
+    .vpn-overview-badge.is-enabled { background: #e8f6ee; color: #167a4e; }
+    .vpn-overview-badge.is-error,
+    .vpn-overview-badge.is-not_ready { background: #fff0ed; color: #ad3825; }
+    .vpn-overview-badge.is-stopped { background: #f1f3f4; color: #65737d; }
+    @media (max-width: 700px) {
+        .vpn-overview-grid { grid-template-columns: 1fr; }
+        .vpn-overview-heading { padding-right: 0; flex-wrap: wrap; margin-top: 42px; }
+    }
+}
+
+.vpn-log-reader {
+    max-width: 900px;
+    margin-top: 14px;
+}
+.vpn-log-reader md-input-container { min-width: 220px; max-width: 380px; width: 100%; }

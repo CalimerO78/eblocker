@@ -1,0 +1,22 @@
+<div class="config-frame md-whiteframe-z1 vpn-log-reader" ng-if="vm.logFiles.length > 0">
+    <h3>{{'ADMINCONSOLE.VPN_LOGS.TITLE' | translate}}</h3>
+    <md-input-container>
+        <label>{{'ADMINCONSOLE.VPN_LOGS.FILE' | translate}}</label>
+        <md-select ng-model="vm.logFile" ng-change="vm.readLog()">
+            <md-option ng-repeat="file in vm.logFiles track by file.id" ng-value="file.id">{{file.id}}</md-option>
+        </md-select>
+    </md-input-container>
+    <md-input-container>
+        <label>{{'ADMINCONSOLE.SYSTEM_INFO.SEARCH_LOG' | translate}}</label>
+        <input type="search" ng-model="vm.logQuery" ng-model-options="{debounce: 500}"
+               ng-change="vm.readLog()" maxlength="80">
+        <md-tooltip md-delay="300">{{'ADMINCONSOLE.VPN_LOGS.SEARCH_HELP' | translate}}</md-tooltip>
+    </md-input-container>
+    <md-button ng-click="vm.loadLogs()">{{'ADMINCONSOLE.SYSTEM_INFO.REFRESH' | translate}}</md-button>
+    <p class="content-error" ng-if="vm.logError">{{'ADMINCONSOLE.SYSTEM_INFO.LOGS_ERROR' | translate}}</p>
+    <p ng-if="vm.logQuery.length > 0 && vm.logQuery.trim().length < 3">{{'ADMINCONSOLE.SYSTEM_INFO.LOG_SEARCH_NOTE' | translate}}</p>
+    <p ng-if="vm.logResult.windowTruncated">{{'ADMINCONSOLE.SYSTEM_INFO.LOG_WINDOW' | translate}}</p>
+    <p ng-if="vm.logResult && !vm.logResult.lines.length">{{'ADMINCONSOLE.SYSTEM_INFO.NO_MATCHES' | translate}}</p>
+    <pre class="si-log-lines" ng-if="vm.logResult.lines.length"><span ng-repeat="line in vm.logResult.lines track by $index">{{line}}
+</span></pre>
+</div>

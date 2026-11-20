@@ -73,6 +73,8 @@ export default function RoutesConfig($urlRouterProvider, $stateProvider, STATES)
 
     // Sets the default State when root URL is called: 'https://domain:3000/settings' / 'https://domain:3000'
     $urlRouterProvider.when('/devices/vpn-access', '/mobile/vpn-access');
+    $urlRouterProvider.when('/mobile/tests', '/mobile/status');
+    $urlRouterProvider.when('/mobile/dyndns', '/mobile/status');
     $urlRouterProvider.otherwise('/' + STATES.AUTH);
 
     const slashOptionUrl = '';
@@ -1043,19 +1045,19 @@ export default function RoutesConfig($urlRouterProvider, $stateProvider, STATES)
     const vpnHomeState = {
         name: STATES.VPN_HOME_STATE,
         parent: vpnHome.name,
-        redirectTo: 'mobiledyndns',
+        redirectTo: 'mobilestatus',
         requiredLicense: vpnHome.requiredLicense,
         component: 'vpnHomeComponent'
     };
 
-    const vpnHomeDynDns = {
-        name: 'mobiledyndns',
-        url: slashOptionSubState + 'dyndns',
+    const vpnHomeOverview = {
+        name: 'mobilestatus',
+        url: slashOptionSubState + 'status',
         parent: vpnHomeState.name,
         tabOrder: 1,
         requiredLicense: vpnHomeState.requiredLicense,
-        translationKey: 'ADMINCONSOLE.VPN_HOME_DYNDNS.LABEL',
-        component: 'vpnHomeDynDnsComponent'
+        translationKey: 'ADMINCONSOLE.VPN_HOME_OVERVIEW.LABEL',
+        component: 'vpnHomeOverviewComponent'
     };
 
     const vpnHomeOpenVpn = {
@@ -1088,17 +1090,6 @@ export default function RoutesConfig($urlRouterProvider, $stateProvider, STATES)
         translationKey: 'ADMINCONSOLE.VPN_ACCESS.LABEL',
         component: 'vpnAccessComponent'
     };
-
-    const vpnHomeTests = {
-        name: 'mobiletests',
-        url: slashOptionSubState + 'tests',
-        parent: vpnHomeState.name,
-        tabOrder: 4,
-        requiredLicense: vpnHomeState.requiredLicense,
-        translationKey: 'ADMINCONSOLE.VPN_HOME_TESTS.LABEL',
-        component: 'vpnHomeTestsComponent'
-    };
-
 
     const vpnHomeWizard = {
         name: STATES.VPN_HOME_WIZARD,
@@ -1144,7 +1135,7 @@ export default function RoutesConfig($urlRouterProvider, $stateProvider, STATES)
         homeLegal, parentalControl, parentalControlState, devices, ssl, sslStatus,
         sslCertificate, sslFails, trustedApps, trustedDomains, ipAnon, ipAnonState,
         system, network, networkSettings, networkSettingsIp6, networkWizard, vpnHome, vpnHomeState,
-        vpnHomeDynDns, vpnHomeOpenVpn, vpnHomeWireGuard, vpnHomeTests, manualRecording, users,
+        vpnHomeOverview, vpnHomeOpenVpn, vpnHomeWireGuard, manualRecording, users,
         blacklists, whitelists, tor, vpnconnect, dns, status, systemInfo, timeAndLanguage,
         events, backup, reset, diagnostics, usersDetails,
         blacklistDetails, whitelistDetails, devicesState, devicesDetails, vpnconnectDetails, tasks,
