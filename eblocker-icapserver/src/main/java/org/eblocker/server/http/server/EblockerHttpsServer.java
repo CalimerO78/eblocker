@@ -1536,10 +1536,6 @@ public class EblockerHttpsServer implements Preprocessor {
                 .name("adminconsole.wireguard.peers.lanAccess.put");
 
         server
-                .uri("/api/adminconsole/wireguard/peers/{id}/routing", wireGuardServerController)
-                .action("setRouting", HttpMethod.PUT)
-                .name("adminconsole.wireguard.peers.routing.put");
-        server
                 .uri("/api/adminconsole/wireguard/endpoint", wireGuardServerController)
                 .action("getEndpointConfig", HttpMethod.GET)
                 .name("adminconsole.wireguard.endpoint.get");

@@ -93,18 +93,18 @@ public class SystemInfoService {
 
     private Map<String, Object> build() {
         Properties properties = new Properties();
-        try (InputStream input = getClass().getResourceAsStream("/systeminfo-build.properties")) {
-            if (input != null) properties.load(input);
-        } catch (IOException ignored) {
-            // Missing build metadata must never hide the rest of the snapshot.
-        }
         Path installedManifest = etc.resolve("eblocker/systeminfo-build.properties");
         if (Files.isRegularFile(installedManifest)) {
             try (InputStream input = Files.newInputStream(installedManifest)) {
                 properties.load(input);
             } catch (IOException ignored) {
-                // Keep the embedded provenance if the optional local manifest is unreadable.
+                // An unreadable local manifest must not hide embedded provenance.
             }
+        }
+        try (InputStream input = getClass().getResourceAsStream("/systeminfo-build.properties")) {
+            if (input != null) properties.load(input);
+        } catch (IOException ignored) {
+            // Missing build metadata must never hide the rest of the snapshot.
         }
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("baseRevision", properties.getProperty("baseRevision"));

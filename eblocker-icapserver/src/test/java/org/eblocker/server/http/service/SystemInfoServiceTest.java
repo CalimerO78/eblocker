@@ -61,7 +61,7 @@ public class SystemInfoServiceTest {
         Assert.assertEquals(500000L * 1024, memory.get("freeBytes"));
         Assert.assertEquals(256000L * 1024, memory.get("swapUsedBytes"));
         Assert.assertEquals(List.of("192.0.2.53"), snapshot.get("dnsServers"));
-        Assert.assertEquals("content-picker-scriptlets2,systeminfo-41,wireguard-full", build.get("enhancements"));
+        Assert.assertEquals("content-picker-scriptlets2,systeminfo-41,wireguard-slim", build.get("enhancements"));
         Assert.assertFalse(snapshot.toString().contains("search example.test"));
     }
 

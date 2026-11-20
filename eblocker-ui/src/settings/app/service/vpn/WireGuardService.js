@@ -77,15 +77,6 @@ export default function WireGuardService($http, $q) {
             .then(standardSuccess, standardError);
     }
 
-    function setRouting(peerId, config) {
-        return $http.put(
-            PATH + '/peers/' +
-                encodeURIComponent(peerId) +
-                '/routing',
-            config
-        ).then(standardSuccess, standardError);
-    }
-
     function standardSuccess(response) {
         return response;
     }
@@ -126,7 +117,6 @@ export default function WireGuardService($http, $q) {
         getClientConfig: getClientConfig,
         getQrCode: getQrCode,
         getEndpoint: getEndpoint,
-        setEndpoint: setEndpoint,
-        setRouting: setRouting
+        setEndpoint: setEndpoint
     };
 }
