@@ -19,6 +19,7 @@ package org.eblocker.server.http.controller;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import org.eblocker.server.http.service.DynDnsService;
 import org.eblocker.server.http.service.SystemInfoService;
 import org.eblocker.server.http.service.SystemListInfoService;
 import org.eblocker.server.http.service.SystemEblockerStatusService;
@@ -27,6 +28,7 @@ import org.eblocker.server.http.utils.ControllerUtils;
 import org.restexpress.Request;
 import org.restexpress.Response;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Singleton
@@ -35,14 +37,17 @@ public class SystemInfoController {
     private final Provider<SystemListInfoService> lists;
     private final Provider<SystemEblockerStatusService> eblocker;
     private final Provider<SystemLogInfoService> logs;
+    private final Provider<DynDnsService> dynDns;
 
     @Inject
     public SystemInfoController(SystemInfoService service, Provider<SystemListInfoService> lists,
-                                Provider<SystemEblockerStatusService> eblocker, Provider<SystemLogInfoService> logs) {
+                                Provider<SystemEblockerStatusService> eblocker, Provider<SystemLogInfoService> logs,
+                                Provider<DynDnsService> dynDns) {
         this.service = service;
         this.lists = lists;
         this.eblocker = eblocker;
         this.logs = logs;
+        this.dynDns = dynDns;
     }
 
     public Map<String, Object> get(Request request, Response response) {
@@ -51,6 +56,16 @@ public class SystemInfoController {
 
     public Map<String, Object> getEblocker(Request request, Response response) {
         return eblocker.get().snapshot();
+    }
+
+    public Map<String, Object> getDynDns(Request request, Response response) {
+        DynDnsService service = dynDns.get();
+        Map<String, Object> status = new HashMap<>();
+        status.put("enabled", service.isEnabled());
+        status.put("hostname", service.getHostname());
+        // This is the last address reported to eBlocker DynDNS, not a live WAN probe.
+        status.put("reportedIpAddress", service.getIpAddress());
+        return status;
     }
 
     public Map<String, Object> getLogs(Request request, Response response) {

@@ -3833,7 +3833,17 @@
         "VPN_HOME_TESTS": {
             "LABEL": "Tests",
             "TITLE": "Tests und Diagnose",
-            "PLACEHOLDER": "Gemeinsame Verbindungs- und Diagnosetests für OpenVPN und WireGuard werden hier zusammengeführt."
+            "PLACEHOLDER": "Gemeinsame Verbindungs- und Diagnosetests für OpenVPN und WireGuard werden hier zusammengeführt.",
+            "UNKNOWN": "Unbekannt",
+            "RUNNING": "Läuft",
+            "STOPPED": "Gestoppt",
+            "EXTERNAL_IP": "Externe IP",
+            "IP_NOTE": "Zuletzt an eBlocker DynDNS gemeldete Adresse; keine Live-WAN-Prüfung.",
+            "CERTIFICATE": "eBlocker-HTTPS-Zertifikat",
+            "READY": "Bereit",
+            "NOT_READY": "Nicht bereit",
+            "LOG_READER": "Log-Anzeige",
+            "LOG_FILE": "Logdatei"
         }
     },
     "HELP_ICON": {

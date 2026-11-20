@@ -71,6 +71,12 @@ public class DynDnsServiceTest {
     }
 
     @Test
+    public void testGetLastReportedIpAddress() {
+        Mockito.when(dataSource.get(DynDnsConfig.class)).thenReturn(createConfig(true, "host.dyndns.eblocker.com", "8.8.8.9"));
+        Assert.assertEquals("8.8.8.9", service.getIpAddress());
+    }
+
+    @Test
     public void testUpdateEnabled() {
         Mockito.when(client.updateDynDnsIpAddress()).thenReturn(new DynDnsEntry("host.dyndns.eblocker.com", "8.8.8.9"));
         DynDnsConfig config = createConfig(true, null, null);

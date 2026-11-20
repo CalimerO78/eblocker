@@ -1,21 +1,61 @@
-<div layout="column"
-     layout-fill
-     class="settings-child-view">
+<div layout="column" layout-fill class="settings-child-view">
     <div layout-padding>
-
-        <div flex-gt-lg="65"
-             flex-md="75"
-             flex-lg="75"
-             class="config-frame md-whiteframe-z1">
-
-            <h3 style="margin-top: 0;"
-                translate="ADMINCONSOLE.VPN_HOME_TESTS.TITLE">
-            </h3>
-
-            <p translate="ADMINCONSOLE.VPN_HOME_TESTS.PLACEHOLDER">
-            </p>
-
+        <div class="config-frame md-whiteframe-z1" style="max-width: 900px;">
+            <div layout="row" layout-align="space-between center">
+                <h3 translate="ADMINCONSOLE.VPN_HOME_TESTS.TITLE"></h3>
+                <md-button class="md-raised" ng-click="vm.refresh()" ng-disabled="vm.loading">
+                    {{'ADMINCONSOLE.SYSTEM_INFO.REFRESH' | translate}}
+                </md-button>
+            </div>
+            <div layout="row" layout-wrap layout-padding>
+                <div flex-gt-sm="33" flex="50"><strong>OpenVPN</strong><br>
+                    <span ng-if="vm.status.openvpn === undefined || vm.status.openvpn === null">{{'ADMINCONSOLE.VPN_HOME_TESTS.UNKNOWN' | translate}}</span>
+                    <span ng-if="vm.status.openvpn && vm.status.openvpn.isRunning">{{'ADMINCONSOLE.VPN_HOME_TESTS.RUNNING' | translate}}</span>
+                    <span ng-if="vm.status.openvpn && !vm.status.openvpn.isRunning">{{'ADMINCONSOLE.VPN_HOME_TESTS.STOPPED' | translate}}</span>
+                </div>
+                <div flex-gt-sm="33" flex="50"><strong>WireGuard</strong><br>
+                    <span ng-if="vm.status.wireguard === undefined || vm.status.wireguard === null">{{'ADMINCONSOLE.VPN_HOME_TESTS.UNKNOWN' | translate}}</span>
+                    <span ng-if="vm.status.wireguard && !vm.status.wireguard.enabled">{{'ADMINCONSOLE.VPN_HOME_TESTS.STOPPED' | translate}}</span>
+                    <span ng-if="vm.status.wireguard && vm.status.wireguard.enabled">{{'ADMINCONSOLE.VPN_HOME_TESTS.RUNNING' | translate}} · {{vm.status.wireguard.runtime.service || '–'}} · {{vm.status.wireguard.runtime.peers || 0}} Peers</span>
+                    <small ng-if="vm.status.wireguard.runtime.error"><br>{{vm.status.wireguard.runtime.error}}</small>
+                </div>
+                <div flex-gt-sm="33" flex="50"><strong>DynDNS</strong><br>
+                    <span ng-if="vm.status.dyndns === undefined || vm.status.dyndns === null">{{'ADMINCONSOLE.VPN_HOME_TESTS.UNKNOWN' | translate}}</span>
+                    <span ng-if="vm.status.dyndns && !vm.status.dyndns.enabled">{{'ADMINCONSOLE.VPN_HOME_TESTS.STOPPED' | translate}}</span>
+                    <span ng-if="vm.status.dyndns && vm.status.dyndns.enabled">{{vm.status.dyndns.hostname || ('ADMINCONSOLE.VPN_HOME_TESTS.UNKNOWN' | translate)}}</span>
+                </div>
+                <div flex-gt-sm="33" flex="50"><strong>{{'ADMINCONSOLE.VPN_HOME_TESTS.EXTERNAL_IP' | translate}}</strong><br>
+                    {{vm.status.dyndns.reportedIpAddress || ('ADMINCONSOLE.VPN_HOME_TESTS.UNKNOWN' | translate)}}
+                    <small style="display:block">{{'ADMINCONSOLE.VPN_HOME_TESTS.IP_NOTE' | translate}}</small>
+                </div>
+                <div flex-gt-sm="33" flex="50"><strong>{{'ADMINCONSOLE.VPN_HOME_TESTS.CERTIFICATE' | translate}}</strong><br>
+                    <span ng-if="vm.status.certificate === true">{{'ADMINCONSOLE.VPN_HOME_TESTS.READY' | translate}}</span>
+                    <span ng-if="vm.status.certificate === false">{{'ADMINCONSOLE.VPN_HOME_TESTS.NOT_READY' | translate}}</span>
+                    <span ng-if="vm.status.certificate !== true && vm.status.certificate !== false">{{'ADMINCONSOLE.VPN_HOME_TESTS.UNKNOWN' | translate}}</span>
+                </div>
+            </div>
         </div>
-
+        <div class="config-frame md-whiteframe-z1" style="max-width: 900px; margin-top: 12px;">
+            <h3>{{'ADMINCONSOLE.VPN_HOME_TESTS.LOG_READER' | translate}}</h3>
+            <p>{{'ADMINCONSOLE.SYSTEM_INFO.LOGS_SCOPE' | translate}}</p>
+            <md-input-container style="min-width: 260px;">
+                <label>{{'ADMINCONSOLE.VPN_HOME_TESTS.LOG_FILE' | translate}}</label>
+                <md-select ng-model="vm.logFile" ng-change="vm.readLog()">
+                    <md-option ng-repeat="file in vm.logFiles track by file.id" ng-value="file.id">{{file.id}}</md-option>
+                </md-select>
+            </md-input-container>
+            <md-input-container style="min-width: 260px;">
+                <label>{{'ADMINCONSOLE.SYSTEM_INFO.SEARCH_LOG' | translate}}</label>
+                <input type="search" ng-model="vm.logQuery" ng-model-options="{debounce: 500}"
+                       ng-change="vm.readLog()" maxlength="80">
+            </md-input-container>
+            <md-button ng-click="vm.loadLogs()">{{'ADMINCONSOLE.SYSTEM_INFO.REFRESH' | translate}}</md-button>
+            <p ng-if="vm.logsError || vm.logError">{{'ADMINCONSOLE.SYSTEM_INFO.LOGS_ERROR' | translate}}</p>
+            <p ng-if="vm.logQuery.length > 0 && vm.logQuery.trim().length < 3">{{'ADMINCONSOLE.SYSTEM_INFO.LOG_SEARCH_NOTE' | translate}}</p>
+            <p ng-if="vm.logResult.windowTruncated">{{'ADMINCONSOLE.SYSTEM_INFO.LOG_WINDOW' | translate}}</p>
+            <p ng-if="vm.logResult && !vm.logResult.lines.length">{{'ADMINCONSOLE.SYSTEM_INFO.NO_MATCHES' | translate}}</p>
+            <pre class="si-log-lines" ng-if="vm.logResult.lines.length"><span ng-repeat="line in vm.logResult.lines track by $index">{{line}}
+</span></pre>
+        </div>
     </div>
 </div>

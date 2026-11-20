@@ -3824,7 +3824,17 @@
         "VPN_HOME_TESTS" : {
             "LABEL" : "Tests",
             "TITLE" : "Tests and diagnostics",
-            "PLACEHOLDER" : "Shared connection and diagnostic tests for OpenVPN and WireGuard will be consolidated here."
+            "PLACEHOLDER" : "Shared connection and diagnostic tests for OpenVPN and WireGuard will be consolidated here.",
+            "UNKNOWN": "Unknown",
+            "RUNNING": "Running",
+            "STOPPED": "Stopped",
+            "EXTERNAL_IP": "External IP",
+            "IP_NOTE": "Last address reported to eBlocker DynDNS; not a live WAN check.",
+            "CERTIFICATE": "eBlocker HTTPS certificate",
+            "READY": "Ready",
+            "NOT_READY": "Not ready",
+            "LOG_READER": "Log reader",
+            "LOG_FILE": "Log file"
         }
     },
     "HELP_ICON" : {

@@ -1257,6 +1257,10 @@ public class EblockerHttpsServer implements Preprocessor {
                 .name("adminconsole.systeminfo.lists.search.route");
 
         server
+                .uri("/api/adminconsole/systeminfo/dyndns", systemInfoController)
+                .action("getDynDns", HttpMethod.GET)
+                .name("adminconsole.systeminfo.dyndns.get.route");
+        server
                 .uri("/api/adminconsole/systeminfo/logs", systemInfoController)
                 .action("getLogs", HttpMethod.GET)
                 .name("adminconsole.systeminfo.logs.get.route");

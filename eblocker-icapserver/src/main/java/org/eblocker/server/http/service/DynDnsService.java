@@ -55,6 +55,10 @@ public class DynDnsService {
         return loadConfig().getHostname();
     }
 
+    public String getIpAddress() {
+        return loadConfig().getIpAddress();
+    }
+
     public synchronized void update() {
         DynDnsConfig config = loadConfig();
         if (!config.isEnabled()) {

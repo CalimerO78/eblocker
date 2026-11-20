@@ -1083,7 +1083,7 @@ export default function RoutesConfig($urlRouterProvider, $stateProvider, STATES)
         name: 'devicesvpnaccess',
         url: slashOptionSubState + 'vpn-access',
         parent: vpnHomeState.name,
-        tabOrder: 4,
+        ignoreTab: true,
         requiredLicense: vpnHomeState.requiredLicense,
         translationKey: 'ADMINCONSOLE.VPN_ACCESS.LABEL',
         component: 'vpnAccessComponent'
@@ -1093,7 +1093,7 @@ export default function RoutesConfig($urlRouterProvider, $stateProvider, STATES)
         name: 'mobiletests',
         url: slashOptionSubState + 'tests',
         parent: vpnHomeState.name,
-        tabOrder: 5,
+        tabOrder: 4,
         requiredLicense: vpnHomeState.requiredLicense,
         translationKey: 'ADMINCONSOLE.VPN_HOME_TESTS.LABEL',
         component: 'vpnHomeTestsComponent'
